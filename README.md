@@ -8,6 +8,19 @@ The [latest release](https://github.com/kageurufu/Marlin-CR30/releases/latest) s
 
 Pre-releases are based on the Marlin bugfix-2.0.x branch and may include breaking bugs.
 
+Firmware based on changes from Karl of Nak3D Designs, sourced from https://github.com/NAK3DDesigns/CR-30-Firmware. 
+
+Huge thanks to everyone on the [3D Print Mill Discord](https://discord.gg/hp5EjZyWdz) for testing. 
+
+# Slicers
+
+* [Kiri-Moto (web-based)](https://grid.space/kiri/)
+* [IdeaMaker (beta)](https://www.ideamaker.io/)
+* Cura-based (not recommended right now)
+  * [Belt Printer Slicing Plugin for Cura 4.8](https://github.com/BirthT/BeltPrinterSlicing)
+  * [CrealityBelt Cura](https://forums.creality3dofficial.com/download/software/)
+  * [Blackbelt Cura](https://blackbelt-3d.com/download-area/)
+
 # Marlin 3D Printer Firmware
 
 ![GitHub](https://img.shields.io/github/license/marlinfirmware/marlin.svg)

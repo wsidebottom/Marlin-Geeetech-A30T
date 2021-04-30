@@ -70,7 +70,10 @@
 //
 // Servos
 //
-#define SERVO0_PIN                          PB0   // BLTouch OUT
+#if !HAS_TMC_UART
+  #define SERVO0_PIN                          PB0   // BLTouch OUT
+  #define Z_MIN_PROBE_PIN                     PB1   // BLTouch IN
+#endif
 
 //
 // Limit Switches
@@ -79,7 +82,6 @@
 #define Y_STOP_PIN                          PA7
 #define Z_STOP_PIN                          PA5
 
-#define Z_MIN_PROBE_PIN                     PA5   // BLTouch IN
 
 //
 // Filament Runout Sensor
@@ -143,6 +145,19 @@
 #define FAN_PIN                             PA2   // FAN
 #define FAN_SOFT_PWM
 
+//#ifndef FAN1_PIN
+//  #define FAN1_PIN                         PC0
+//#endif
+
+//#ifndef FAN2_PIN
+//  #define FAN2_PIN                         PC1
+//#endif
+
+#ifndef CASE_LIGHT_PIN
+  #define CASE_LIGHT_PIN                     PC14   // LED driving pin
+#endif
+
+
 //
 // SD Card
 //
@@ -203,4 +218,20 @@
 
   #define BEEPER_PIN                        PA5
 
+#endif
+
+#if HAS_TMC_UART
+  #define X_SERIAL_TX_PIN                   PB0
+  #define X_SERIAL_RX_PIN                   PB0
+
+  #define Y_SERIAL_TX_PIN                   PB1
+  #define Y_SERIAL_RX_PIN                   PB1
+
+  #define Z_SERIAL_TX_PIN                   PA13
+  #define Z_SERIAL_RX_PIN                   PA13
+
+  #define E0_SERIAL_TX_PIN                  PA14
+  #define E0_SERIAL_RX_PIN                  PA14
+
+  #define TMC_BAUD_RATE                    19200
 #endif

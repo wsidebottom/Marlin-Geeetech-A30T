@@ -1,0 +1,23 @@
+name: Release Tags
+
+on:
+  push:
+    tags:
+      - "*_cr30"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker://sglahn/platformio-core:latest
+        with:
+          args: run
+          
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            .pio/build/**/firmware*.bin

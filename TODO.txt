@@ -1,4 +1,3 @@
 * Fix "Serial.end()" hack in MarlinCore.cpp#setup() (currently needed for X axis to work)
-* configure bltouch correctly
 * use serial port to connect to proprietary LCD
 * implement LCD code handling

@@ -1598,6 +1598,8 @@ void setup() {
 
   marlin_state = MF_RUNNING;
 
+  Serial.end();
+
   SETUP_LOG("setup() completed.");
 }
 

@@ -1,3 +1,2 @@
 * Fix "Serial.end()" hack in MarlinCore.cpp#setup() (currently needed for X axis to work)
-* use serial port to connect to proprietary LCD
-* implement LCD code handling
+* finish implementing LCD code handling

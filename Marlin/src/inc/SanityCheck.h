@@ -2661,6 +2661,7 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
   + ENABLED(MAKEBOARD_MINI_2_LINE_DISPLAY_1602) \
   + ENABLED(MAKRPANEL) \
   + ENABLED(MALYAN_LCD) \
+  + ENABLED(GEEETECH_A30T_TFT) \
   + ENABLED(NEXTION_TFT) \
   + ENABLED(MKS_LCD12864A) \
   + ENABLED(MKS_LCD12864B) \
@@ -2803,6 +2804,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #error "LCD_SERIAL_PORT cannot be the same as SERIAL_PORT."
   #elif defined(SERIAL_PORT_2) && LCD_SERIAL_PORT == SERIAL_PORT_2
     #error "LCD_SERIAL_PORT cannot be the same as SERIAL_PORT_2."
+  #elif ENABLED(GEEETECH_A30T_TFT) && (!defined(LCD_UART_RX) || !defined(LCD_UART_TX))
+    #error "GEEETECH_A30T_TFT needs LCD_UART_RX and LCD_UART_TX to be defined"
   #endif
 #else
   #if HAS_DGUS_LCD
@@ -2811,6 +2814,8 @@ static_assert(Y_MAX_LENGTH >= Y_BED_SIZE, "Movement bounds (Y_MIN_POS, Y_MAX_POS
     #error "The ANYCUBIC LCD requires LCD_SERIAL_PORT to be defined."
   #elif ENABLED(MALYAN_LCD)
     #error "MALYAN_LCD requires LCD_SERIAL_PORT to be defined."
+  #elif ENABLED(GEEETECH_A30T_TFT)
+    #error "GEEETECH_A30T_TFT requires LCD_SERIAL_PORT to be defined."
   #endif
 #endif
 

@@ -84,7 +84,7 @@
  */
 
 // Show the Marlin bootscreen on startup. ** ENABLE FOR PRODUCTION **
-#define SHOW_BOOTSCREEN
+//#define SHOW_BOOTSCREEN
 
 // Show the bitmap in Marlin/_Bootscreen.h on startup.
 //#define SHOW_CUSTOM_BOOTSCREEN
@@ -339,7 +339,7 @@
 #if ENABLED(MIXING_EXTRUDER)
   #define MIXING_STEPPERS 3        // Number of steppers in your mixing extruder
   #define MIXING_VIRTUAL_TOOLS 16  // Use the Virtual Tool method with M163 and M164
-  //#define DIRECT_MIXING_IN_G1    // Allow ABCDHI mix factors in G1 movement commands
+  #define DIRECT_MIXING_IN_G1    // Allow ABCDHI mix factors in G1 movement commands
   #define GRADIENT_MIX           // Support for gradient mixing with M166 and LCD
   //#define MIXING_PRESETS         // Assign 8 default V-tool presets for 2 or 3 MIXING_STEPPERS
   #if ENABLED(GRADIENT_MIX)
@@ -2654,6 +2654,14 @@
  * Specific TFT Model Presets. Enable one of the following options
  * or enable TFT_GENERIC and set sub-options.
  */
+
+//
+// Touch-screen TFT for Geeetech A30T printers (original proprietary firmware)
+//
+#define GEEETECH_A30T_TFT
+#if ENABLED(GEEETECH_A30T_TFT)
+  #define LCD_SERIAL_PORT 2 // Default is 2 for Geeetech A30T
+#endif
 
 //
 // 480x320, 3.5", SPI Display with Rotary Encoder from MKS

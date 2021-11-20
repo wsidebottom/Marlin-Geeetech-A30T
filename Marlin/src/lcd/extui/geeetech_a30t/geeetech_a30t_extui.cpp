@@ -33,33 +33,73 @@
 
 namespace ExtUI
 {
+#define STATUS_CYCLE_IN_MS 1000
+  millis_t nextStatusSend = 0;
+  bool ignoreIncomingCommands = false;
+
   void onStartup()
   {
     // use pin PD12 (60) as output and pull it up to supply 5V power
     SET_OUTPUT(60);
     WRITE(60, 1);
 
-    // setup the communication with the display   
+    // setup the communication with the display
     LCD_SERIAL.setRx(LCD_UART_RX); // use PD9 for RX
     LCD_SERIAL.setTx(LCD_UART_TX); // use PD8 for TX
-    LCD_SERIAL.begin(115200); // Geeetech uses 115200 speed
+    LCD_SERIAL.begin(115200);      // Geeetech uses 115200 speed(
 
-    #ifdef MYSERIAL1
+#ifdef MYSERIAL1
     MYSERIAL1.println("Geeetech A30T TFT initialized");
-    #endif
+#endif
   }
+
+#define MAX_RECEIVE_COMMANDS 10
 
   void onIdle()
   {
-    while (LCD_SERIAL.available()) {
-      String command = receiveCommand();
+    const millis_t currentTimeMs = millis();
+    if (ELAPSED(currentTimeMs, nextStatusSend))
+    {
+      sendStatus();
+      nextStatusSend = currentTimeMs + STATUS_CYCLE_IN_MS;
+    }
 
-      if (canForwardToQueue(command))
-        queueGcode(command);
-      #ifdef MYSERIAL1
-      else
-        MYSERIAL1.println(("Cannot queue: " + command).c_str());
-      #endif
+    String commands[MAX_RECEIVE_COMMANDS];
+    int receivedCommands = 0;
+    for (; receivedCommands < MAX_RECEIVE_COMMANDS && LCD_SERIAL.available(); receivedCommands++)
+      commands[receivedCommands] = receiveCommand();
+
+    if (!ignoreIncomingCommands) // commands during homing etc. will be lost
+    {
+      String proprietaryCommands[10];
+      uint8_t proprietaryCommandIndex = 0;
+      String commandsToQueue = "";
+      String unknownCommands = "";
+      for (uint8_t i = 0; i < receivedCommands; i++)
+      {
+        if (isProprietaryCommand(commands[i]))
+          proprietaryCommands[proprietaryCommandIndex++] = commands[i];
+        else if (canForwardToQueue(commands[i]))
+          commandsToQueue += commands[i] + "\n";
+        else
+          unknownCommands += commands[i] + "\n";
+        if (commands[i].startsWith("G28") || commands[i].startsWith("G29"))
+          break;
+      }
+      if (commandsToQueue.length() > 0)
+      {
+        queueGcode(commandsToQueue.substring(0, commandsToQueue.length() - 1));
+        nextStatusSend = currentTimeMs; // update status in next cycle
+      }
+
+#ifdef MYSERIAL1
+      if (unknownCommands.length() > 0)
+      {
+        MYSERIAL1.write("Cannot queue: ");
+        MYSERIAL1.write(unknownCommands.c_str());
+      }
+      MYSERIAL1.write("\n");
+#endif
     }
   }
 
@@ -72,7 +112,7 @@ namespace ExtUI
   void onPrintTimerStopped() {}
   void onPrintFinished() {}
 
-  void onStatusChanged(const char * const msg) {}
+  void onStatusChanged(const char *const msg) {}
 
   void onMediaInserted() {}
   void onMediaError() {}
@@ -80,11 +120,11 @@ namespace ExtUI
 
   void onPlayTone(const uint16_t, const uint16_t) {}
 
-  void onUserConfirmRequired(const char * const msg) {};
+  void onUserConfirmRequired(const char *const msg){};
 
-  void onHomingStart() {}
-  void onHomingComplete() {}
-  
+  void onHomingStart() { ignoreIncomingCommands = true; }
+  void onHomingComplete() { ignoreIncomingCommands = false; }
+
   void onFactoryReset() {}
   void onStoreSettings(char *) {}
   void onLoadSettings(const char *) {}
@@ -94,19 +134,26 @@ namespace ExtUI
 
   void onMeshLevelingStart() {}
   void onMeshUpdate(const int8_t xpos, const int8_t ypos, const_float_t zval) {}
-  void onMeshUpdate(const int8_t xpos, const int8_t ypos, const ExtUI::probe_state_t state) {}
+  void onMeshUpdate(const int8_t xpos, const int8_t ypos, const ExtUI::probe_state_t state)
+  {
+    ignoreIncomingCommands = ExtUI::probe_state_t::G29_FINISH == state;
+  }
 
   void onPowerLossResume() {}
 
   void onSteppersDisabled() {}
   void onSteppersEnabled() {}
 
-  #if ENABLED(POWER_LOSS_RECOVERY)
-    void onPowerLossResume() {}
-  #endif
-  #if HAS_PID_HEATING
-    void onPidTuning(const result_t rst) {}
-  #endif
+#if ENABLED(POWER_LOSS_RECOVERY)
+  void onPowerLossResume()
+  {
+  }
+#endif
+#if HAS_PID_HEATING
+  void onPidTuning(const result_t rst)
+  {
+  }
+#endif
 }
 
 #endif // GEEETECH_A30T_TFT

@@ -30,7 +30,7 @@
 /**
  * @brief Receive a command from the display. 
  * 
- * @return String the received command. Line number and checksum are already removed.
+ * @return the received command. Line number and checksum are already removed.
  */
 String receiveCommand();
 
@@ -42,9 +42,14 @@ String receiveCommand();
  */
 bool canForwardToQueue(String command);
 
+bool isProprietaryCommand(String command);
+
 /**
  * @brief queue a gcode command for the printer
  * 
  * @param gcode the command to queue. Should be valid GCODE.
  */
 void queueGcode(String gcode);
+
+void sendStatus();
+void sendToDisplay(PGM_P message, bool addChecksum = true);

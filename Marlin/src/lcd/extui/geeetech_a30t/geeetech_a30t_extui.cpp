@@ -31,77 +31,12 @@
 #include "../ui_api.h"
 #include "geeetech_a30t.h"
 
+using namespace Geeetech;
+
 namespace ExtUI
 {
-#define STATUS_CYCLE_IN_MS 1000
-  millis_t nextStatusSend = 0;
-  bool ignoreIncomingCommands = false;
-
-  void onStartup()
-  {
-    // use pin PD12 (60) as output and pull it up to supply 5V power
-    SET_OUTPUT(60);
-    WRITE(60, 1);
-
-    // setup the communication with the display
-    LCD_SERIAL.setRx(LCD_UART_RX); // use PD9 for RX
-    LCD_SERIAL.setTx(LCD_UART_TX); // use PD8 for TX
-    LCD_SERIAL.begin(115200);      // Geeetech uses 115200 speed(
-
-#ifdef MYSERIAL1
-    MYSERIAL1.println("Geeetech A30T TFT initialized");
-#endif
-  }
-
-#define MAX_RECEIVE_COMMANDS 10
-
-  void onIdle()
-  {
-    const millis_t currentTimeMs = millis();
-    if (ELAPSED(currentTimeMs, nextStatusSend))
-    {
-      sendStatus();
-      nextStatusSend = currentTimeMs + STATUS_CYCLE_IN_MS;
-    }
-
-    String commands[MAX_RECEIVE_COMMANDS];
-    int receivedCommands = 0;
-    for (; receivedCommands < MAX_RECEIVE_COMMANDS && LCD_SERIAL.available(); receivedCommands++)
-      commands[receivedCommands] = receiveCommand();
-
-    if (!ignoreIncomingCommands) // commands during homing etc. will be lost
-    {
-      String proprietaryCommands[10];
-      uint8_t proprietaryCommandIndex = 0;
-      String commandsToQueue = "";
-      String unknownCommands = "";
-      for (uint8_t i = 0; i < receivedCommands; i++)
-      {
-        if (isProprietaryCommand(commands[i]))
-          proprietaryCommands[proprietaryCommandIndex++] = commands[i];
-        else if (canForwardToQueue(commands[i]))
-          commandsToQueue += commands[i] + "\n";
-        else
-          unknownCommands += commands[i] + "\n";
-        if (commands[i].startsWith("G28") || commands[i].startsWith("G29"))
-          break;
-      }
-      if (commandsToQueue.length() > 0)
-      {
-        queueGcode(commandsToQueue.substring(0, commandsToQueue.length() - 1));
-        nextStatusSend = currentTimeMs; // update status in next cycle
-      }
-
-#ifdef MYSERIAL1
-      if (unknownCommands.length() > 0)
-      {
-        MYSERIAL1.write("Cannot queue: ");
-        MYSERIAL1.write(unknownCommands.c_str());
-      }
-      MYSERIAL1.write("\n");
-#endif
-    }
-  }
+  void onStartup() { Display.startup(); }
+  void onIdle() { Display.onIdle(); }
 
   void onFilamentRunout(const extruder_t extruder) {}
 
@@ -122,8 +57,8 @@ namespace ExtUI
 
   void onUserConfirmRequired(const char *const msg){};
 
-  void onHomingStart() { ignoreIncomingCommands = true; }
-  void onHomingComplete() { ignoreIncomingCommands = false; }
+  void onHomingStart() { Display.ignoreCommands(true); }
+  void onHomingComplete() { Display.ignoreCommands(false); }
 
   void onFactoryReset() {}
   void onStoreSettings(char *) {}
@@ -136,7 +71,7 @@ namespace ExtUI
   void onMeshUpdate(const int8_t xpos, const int8_t ypos, const_float_t zval) {}
   void onMeshUpdate(const int8_t xpos, const int8_t ypos, const ExtUI::probe_state_t state)
   {
-    ignoreIncomingCommands = ExtUI::probe_state_t::G29_FINISH == state;
+    Display.ignoreCommands(ExtUI::probe_state_t::G29_FINISH == state);
   }
 
   void onPowerLossResume() {}

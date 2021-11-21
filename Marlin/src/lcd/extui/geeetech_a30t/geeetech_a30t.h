@@ -27,29 +27,50 @@
 
 #include "../../../HAL/shared/Marduino.h"
 
-/**
- * @brief Receive a command from the display. 
- * 
- * @return the received command. Line number and checksum are already removed.
- */
-String receiveCommand();
+#include "../../../sd/cardreader.h"
+#include "../../../module/temperature.h"
+#include "../../../module/stepper.h"
+#include "../../../module/motion.h"
+#include "../../../libs/duration_t.h"
+#include "../../../module/printcounter.h"
+#include "../../../gcode/queue.h"
 
-/**
- * @brief Check whether a command needs processing or can just be queued as GCODE.
- * 
- * @param command The command to check
- * @return whether the command can just be enqueued without further processing
- */
-bool canForwardToQueue(String command);
+namespace Geeetech
+{
 
-bool isProprietaryCommand(String command);
+    enum CommandType
+    {
+        Unknown,
+        GCode,
+        Proprietary
+    };
 
-/**
- * @brief queue a gcode command for the printer
- * 
- * @param gcode the command to queue. Should be valid GCODE.
- */
-void queueGcode(String gcode);
+    struct UiCommand
+    {
+        CommandType type;
+        String command;
+    };
 
-void sendStatus();
-void sendToDisplay(PGM_P message, bool addChecksum = true);
+    class TouchDisplay
+    {
+    public:
+        static void startup();
+        static void onIdle();
+        static void ignoreCommands(bool ignore);
+    private:
+        static void sendStatus();
+        static void receiveCommands();
+        static bool isProprietaryCommand(String command);
+        static bool canForwardToQueue(String command);
+        static void queueGcode(String command);
+        static String receiveCommand();
+        static void sendToDisplay(PGM_P message, bool addChecksum = true);
+        static void sendL1AxisInfo();
+        static void sendL2TempInfo();
+        static void sendL3PrintInfo();
+        static uint32_t getMixerRatio();
+        static uint8_t getPrintStatus();
+    };
+
+    extern TouchDisplay Display;
+}

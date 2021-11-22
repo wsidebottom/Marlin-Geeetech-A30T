@@ -67,7 +67,7 @@ namespace Geeetech
 
         receiveCommands();
 
-        for (uint8_t i = 0; !ignoreIncomingCommands && i < MAX_RECEIVE_COMMANDS; i++)
+        for (uint8_t i = 0; !ignoreIncomingCommands && i < receivedCommandsCount; i++)
         {
             UiCommand command = receivedCommands[i];
 #ifdef GEEETECH_DISPLAY_DEBUG

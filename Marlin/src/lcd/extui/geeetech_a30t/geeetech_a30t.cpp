@@ -50,7 +50,6 @@
 #if ENABLED(GEEETECH_A30T_TFT)
 
 #include "geeetech_a30t.h"
-#include "geeetech_a30t_defs.h"
 #include "../ui_api.h"
 #include "../../marlinui.h"
 
@@ -58,9 +57,11 @@ using namespace ExtUI;
 
 namespace Geeetech
 {
-    UiCommand commands[MAX_RECEIVE_COMMANDS];
+    UiCommand receivedCommands[MAX_RECEIVE_COMMANDS];
+    uint8_t receivedCommandsCount = 0;
     millis_t nextStatusSend = 0;
     bool ignoreIncomingCommands = false;
+    bool simulatedAutoLevelSwitchOn = true;
 
     void TouchDisplay::startup()
     {
@@ -73,99 +74,131 @@ namespace Geeetech
         LCD_SERIAL.setTx(LCD_UART_TX); // use PD8 for TX
         LCD_SERIAL.begin(115200);      // Geeetech uses 115200 speed(
 
-#ifdef DISPLAY_DEBUG
+#ifdef GEEETECH_DISPLAY_DEBUG
         SERIAL_ECHOLNPGM("Geeetech A30T TFT initialized");
 #endif
     }
 
-    void TouchDisplay::onIdle()
+    void TouchDisplay::receiveAndProcess()
     {
         const millis_t currentTimeMs = millis();
-        if (ELAPSED(currentTimeMs, nextStatusSend))
+        sendStatusIfNeeded(&currentTimeMs);
+
+        receiveCommands();
+
+        for (uint8_t i = 0; !ignoreIncomingCommands && i < receivedCommandsCount; i++)
         {
-            sendStatus();
-            nextStatusSend = currentTimeMs + STATUS_CYCLE_IN_MS;
-        }
-
-        String commands[MAX_RECEIVE_COMMANDS];
-        int receivedCommands = 0;
-        for (; receivedCommands < MAX_RECEIVE_COMMANDS && LCD_SERIAL.available(); receivedCommands++)
-            commands[receivedCommands] = receiveCommand();
-
-        if (!ignoreIncomingCommands) // commands during homing etc. will be lost
-        {
-            String proprietaryCommands[10];
-            uint8_t proprietaryCommandIndex = 0;
-            String commandsToQueue = "";
-            String unknownCommands = "";
-            for (uint8_t i = 0; i < receivedCommands; i++)
-            {
-                if (isProprietaryCommand(commands[i]))
-                    proprietaryCommands[proprietaryCommandIndex++] = commands[i];
-                else if (canForwardToQueue(commands[i]))
-                    commandsToQueue += commands[i] + "\n";
-                else
-                    unknownCommands += commands[i] + "\n";
-                if (commands[i].startsWith("G28") || commands[i].startsWith("G29"))
-                    break;
-            }
-            if (commandsToQueue.length() > 0)
-            {
-                queueGcode(commandsToQueue.substring(0, commandsToQueue.length() - 1));
-                nextStatusSend = currentTimeMs; // update status in next cycle
-            }
-
-#ifdef MYSERIAL1
-            if (unknownCommands.length() > 0)
-            {
-                MYSERIAL1.write("Cannot queue: ");
-                MYSERIAL1.write(unknownCommands.c_str());
-            }
-            MYSERIAL1.write("\n");
+            UiCommand command = receivedCommands[i];
+#ifdef GEEETECH_DISPLAY_DEBUG
+            SERIAL_ECHOLNPGM("CommandType: ", COMMAND_STRINGS[command.type]);
+            SERIAL_ECHOLNPGM("String: ", command.command.c_str());
+            for (uint8_t j = 0; j < PARAMETERS_COUNT; j++)
+                SERIAL_ECHOLNPGM(PARAMETER_STRINGS[j], command.parameters[j].c_str());
 #endif
+
+            if (ignoreIncomingCommands)
+                break;
+
+            if (GCode == command.type)
+                handleGcode(&(command.command));
+            else if (Unknown == command.type)
+                handleUnkownCommand(&command);
+            else
+                handleProprietaryCommand(&command);
+
+            // schedule an immediate answer, if needed
+            if (false FOREACH_ANSWER(command.type, GENERATE_BOOL_COMPARE))
+                nextStatusSend = currentTimeMs;
         }
     }
 
-    void TouchDisplay::ignoreCommands(bool ignore)
+    void TouchDisplay::receiveCommands()
     {
-        ignoreIncomingCommands = true;
+        receivedCommandsCount = 0;
+        while (receivedCommandsCount < MAX_RECEIVE_COMMANDS && LCD_SERIAL.available())
+            receivedCommands[receivedCommandsCount++] = parseCommandString(receiveCommandString());
     }
 
-    String TouchDisplay::receiveCommand()
+    UiCommand TouchDisplay::parseCommandString(const String commandString)
+    {
+        UiCommand result = {}; // init
+        result.type = parseCommandType(commandString);
+
+        if (GCode == result.type)
+            result.command = commandString;
+        else if (Unknown != result.type)
+            parseCommandParameters(&result, commandString);
+
+        return result;
+    }
+
+    void TouchDisplay::parseCommandParameters(UiCommand *command, const String commandString)
+    {
+        String currentCommand = COMMAND_STRINGS[command->type];
+        if (commandString.length() + 1 <= currentCommand.length())
+            return; // no parameters detected
+
+        String parameterString = commandString.substring(currentCommand.length() + 1);
+        for (uint8_t i = 0; i < PARAMETERS_COUNT; i++)
+        {
+            parameterString.trim();
+            if (parameterString.length() == 0)
+                break;
+
+            if (parameterString.startsWith(PARAMETER_STRINGS[i]))
+            {
+                uint8_t substringStart = i == FW ? 3 : strlen(PARAMETER_STRINGS[i]); // need to handle FW differently as it is followed by a colon
+                int index = parameterString.indexOf(' ');
+                if (index > substringStart)
+                {
+                    command->parameters[i] = parameterString.substring(substringStart, index);
+                    parameterString = parameterString.substring(index);
+                }
+                else {
+                    command->parameters[i] = parameterString.substring(substringStart);
+                    break;
+                }
+            }
+        }
+    }
+
+    CommandType TouchDisplay::parseCommandType(const String commandString)
+    {
+        const char firstChar = commandString.charAt(0);
+
+        if ('M' == firstChar || 'L' == firstChar)        // check proprietary commands first
+            for (uint8_t i = 2; i < COMMANDS_COUNT; i++) // start at 2 to exclude Unknown and GCode
+            {
+                if (commandString.startsWith(COMMAND_STRINGS[i]))
+                    return (CommandType)i;
+            }
+
+        if ('M' == firstChar || ('G' == firstChar && 'e' != commandString.charAt(1))) // filter out Geeetech
+            return GCode;
+
+        return Unknown;
+    }
+
+    void TouchDisplay::ignoreCommands(const bool ignore) { ignoreIncomingCommands = ignore; }
+
+    String TouchDisplay::receiveCommandString()
     {
         String receivedLine = LCD_SERIAL.readStringUntil('\n');
         int lastStarChar = receivedLine.lastIndexOf('*');
 
-        // just remove checksum without checking :-0
+        // just remove checksum without checking 8-0
         String result = receivedLine;
         if (lastStarChar > 0)
             result = receivedLine.substring(0, lastStarChar);
 
-        // have to do "while" here because at least one command uses two times "N-0" :(
+        // have to do "while" here because at least one command uses two times "N-0" :-(
         while (result.startsWith("N-0 "))
             result = result.substring(4);
 
         return result;
     }
 
-    bool TouchDisplay::canForwardToQueue(String command)
-    {
-        bool result = false;
-
-        if ('G' == command.charAt(0) && 'e' != command.charAt(1)) // exclude Geeetech
-            result = true;                                        // G-based codes are OK
-        else if ('M' == command.charAt(0) && command.indexOf(' ') <= 4)
-            result = true; // M-based codes are OK if number is max 3 digits
-
-        return result;
-    }
-
-    bool TouchDisplay::isProprietaryCommand(String command)
-    {
-        return false;
-    }
-
-    void TouchDisplay::sendToDisplay(PGM_P message, bool addChecksum)
+    void TouchDisplay::sendToDisplay(PGM_P message, const bool addChecksum)
     {
         if (addChecksum)
         {
@@ -189,9 +222,43 @@ namespace Geeetech
         LCD_SERIAL.write("\r\n");
     }
 
-    void TouchDisplay::queueGcode(String gcode)
+    void TouchDisplay::handleGcode(const String *gcode)
     {
-        queue.enqueue_now_P(PSTR(gcode.c_str()));
+#ifdef GEEETECH_DISPLAY_DEBUG
+        SERIAL_ECHOLNPGM("Queueing command: ", gcode->c_str());
+#endif
+        queue.enqueue_now_P(PSTR(gcode->c_str()));
+    }
+
+    void TouchDisplay::handleUnkownCommand(const UiCommand *command)
+    {
+#ifdef GEEETECH_DISPLAY_DEBUG
+        SERIAL_ECHOLNPGM("Unknown command ignored!");
+#endif
+    }
+
+    void TouchDisplay::handleProprietaryCommand(const UiCommand *command)
+    {
+        if (M2120 == command->type)
+        {
+            handleM2120(command);
+        }
+    }
+
+    void TouchDisplay::handleM2120(const UiCommand *command)
+    {
+        switch (command->parameters[P].charAt(0))
+        {
+        case '0':
+            simulatedAutoLevelSwitchOn = '1' == command->parameters[S].charAt(0);
+            SERIAL_ECHOLNPGM("Switch: ", simulatedAutoLevelSwitchOn);
+            break;
+        default:
+#ifdef GEEETECH_DEBUG_DISPLAY
+            SERIAL_ECHOLNPGM("Did not handle M2120 with P", command->parameters[P].charAt(0));
+#endif
+            break;
+        }
     }
 
     void TouchDisplay::sendL1AxisInfo()
@@ -250,23 +317,27 @@ namespace Geeetech
 
     void TouchDisplay::sendL3PrintInfo()
     {
-        char output[60 + 2 * 1 + 2 * 3 + 7 + 12 + 6 + 1];
-        sprintf(output, "L3 PS:%d VL:0 MT:%d FT:%d AL:1 ST:1 WF:0 MR:%ld FN:%s PG:%d TM:%ld LA:0 LC:0",
+        char output[59 + 3 * 1 + 2 * 3 + 7 + 12 + 6 + 1];
+        sprintf(output, "L3 PS:%d VL:0 MT:%d FT:%d AL:%d ST:1 WF:0 MR:%ld FN:%s PG:%d TM:%ld LA:0 LC:0",
                 getPrintStatus() /*1*/, MOTOR_TENSION_STATUS /*1*/, FILAMENT_SENSOR_STATUS /*3*/,
-                getMixerRatio() /*7*/, CURRENT_FILENAME /*12*/, getProgress_percent() /*3*/,
-                getProgress_seconds_elapsed() /*6*/);
+                simulatedAutoLevelSwitchOn /*1*/, getMixerRatio() /*7*/, CURRENT_FILENAME /*12*/,
+                getProgress_percent() /*3*/, getProgress_seconds_elapsed() /*6*/);
 
         sendToDisplay(PSTR(output));
     }
 
-    void TouchDisplay::sendStatus()
+    void TouchDisplay::sendStatusIfNeeded(const millis_t *currentTimeMs)
     {
-        sendL1AxisInfo();
-        delay(20);
-        sendL2TempInfo();
-        delay(20);
-        sendL3PrintInfo();
-        delay(20);
+        if (ELAPSED(currentTimeMs, nextStatusSend))
+        {
+            sendL1AxisInfo();
+            delay(20);
+            sendL2TempInfo();
+            delay(20);
+            sendL3PrintInfo();
+            delay(20);
+            nextStatusSend = *currentTimeMs + STATUS_CYCLE_IN_MS;
+        }
     }
 } // namespace Geeetech
 

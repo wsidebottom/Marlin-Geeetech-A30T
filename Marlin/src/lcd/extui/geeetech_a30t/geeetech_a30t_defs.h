@@ -26,9 +26,36 @@
  */
 
 // settings
-#define DISPLAY_DEBUG // comment out for production
+#define GEEETECH_DISPLAY_DEBUG // comment out for production
 #define MAX_RECEIVE_COMMANDS 10
 #define STATUS_CYCLE_IN_MS 1000
+
+// enum, string array, count, boolean generation
+#define GENERATE_ENUM(ENUM) ENUM,
+#define GENERATE_STRING(STRING) #STRING,
+#define GENERATE_COUNT(ENUM) +1
+#define GENERATE_BOOL_COMPARE(PARAMETER, COMMAND) || PARAMETER == COMMAND
+
+// command enum
+#define FOREACH_COMMAND(COMMAND) \
+    COMMAND(Unknown)             \
+    COMMAND(GCode)               \
+    COMMAND(M2120)
+
+// parameter enum
+#define FOREACH_PARAMETER(PARAM) \
+    PARAM(P)                     \
+    PARAM(S)                     \
+    PARAM(A)                     \
+    PARAM(B)                     \
+    PARAM(C)                     \
+    PARAM(D)                     \
+    PARAM(FW)
+
+// commands that need immediate answer
+#define FOREACH_ANSWER(PARAMETER, COMMAND) \
+    COMMAND(PARAMETER, M2120)
+
 
 // status values
 #define PRINT_STATUS_IDLE 0
@@ -42,11 +69,18 @@
 
 // status macros
 #define FEEDRATE (uint8_t) round(ExtUI::getFeedrate_mm_s())
-#define BED_ACTIVE thermalManager.isHeatingBed() ? 1 : 0
-#define E0_ACTIVE thermalManager.isHeatingHotend(0) ? 1 : 0
-#define SD_ACTIVE isMediaInserted() ? 0 : 1
+#define BED_ACTIVE thermalManager.isHeatingBed()
+#define E0_ACTIVE thermalManager.isHeatingHotend(0)
+#define SD_ACTIVE !isMediaInserted()
 #define F0_SPEED (uint8_t) round(getActualFan_percent(FAN0))
 #define PRINT_SPEED (uint8_t) round(getFeedrate_percent())
-#define FILAMENT_SENSOR_STATUS getFilamentRunoutEnabled() ? (getFilamentRunoutState() ? FILAMENT_SENSOR_IN : FILAMENT_SENSOR_OUT) : FILAMENT_SENSOR_DISABLED
+#define FILAMENT_SENSOR_STATUS getFilamentRunoutEnabled()        \
+                                   ? (getFilamentRunoutState()   \
+                                          ? FILAMENT_SENSOR_IN   \
+                                          : FILAMENT_SENSOR_OUT) \
+                                   : FILAMENT_SENSOR_DISABLED
 #define CURRENT_FILENAME card.filename
-#define MOTOR_TENSION_STATUS stepper.axis_is_enabled(X_AXIS) || stepper.axis_is_enabled(Y_AXIS) || stepper.axis_is_enabled(Z_AXIS) || stepper.axis_is_enabled(E_AXIS)
+#define MOTOR_TENSION_STATUS stepper.axis_is_enabled(X_AXIS) ||     \
+                                 stepper.axis_is_enabled(Y_AXIS) || \
+                                 stepper.axis_is_enabled(Z_AXIS) || \
+                                 stepper.axis_is_enabled(E_AXIS)

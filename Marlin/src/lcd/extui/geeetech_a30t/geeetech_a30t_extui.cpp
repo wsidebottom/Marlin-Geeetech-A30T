@@ -36,7 +36,7 @@ using namespace Geeetech;
 namespace ExtUI
 {
   void onStartup() { Display.startup(); }
-  void onIdle() { Display.receiveAndProcess(); }
+  void onIdle() { Display.process(); }
 
   void onFilamentRunout(const extruder_t extruder) {}
 

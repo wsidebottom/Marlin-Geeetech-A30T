@@ -23,6 +23,27 @@
 
 /**
  * lcd/extui/geeetech_a30t/geeetech_a30t.h
+ * 
+ * This is the implementation of the communication interface with the
+ * proprietary touch TFT that comes with the Geeetech A30T printer.
+ * 
+ * Basic information about the connection to the display:
+ * The display is powered by 5V over a connector on the board. The 5V is, however,
+ * not enabled right away but has to be switched on through a transistor connected
+ * to pin PD12. Pulling this up makes the display start up.
+ * 
+ * The communication is handled through an UART interface with RX and TX pins being
+ * PD9 and PD8 respectively.
+ * 
+ * The communication happens through a mix of GCODE and additional GCODE-like commands
+ * that are not standard (either L-codes or M-codes with very high numbers). While
+ * playing around with the LCD I collected some information in a github repo
+ * (link below). I'll implement the commands that are most helpful and throw in a
+ * handful of other things as well as I deem nice to have.
+ *
+ * https://github.com/TheThomasD/GeeetechA30T
+ * 
+ * written in 2021 by TheThomasD
  */
 
 #include "geeetech_a30t_defs.h"
@@ -64,30 +85,43 @@ namespace Geeetech
     class TouchDisplay
     {
     public:
+        // public
         static void startup();
-        static void receiveAndProcess();
+        static void process();
         static void ignoreCommands(const bool ignore);
 
     private:
+        static bool ignoreIncomingCommands;
+
+        // send variables
+        static millis_t nextStatusSend;
+        // send methods
+        static void setNextSendMs(const millis_t *currentTimeMs);
         static void sendStatusIfNeeded(const millis_t *currentTimeMs);
         static void sendL1AxisInfo();
         static void sendL2TempInfo();
         static void sendL3PrintInfo();
         static void sendToDisplay(PGM_P message, const bool addChecksum = true);
-
         static uint32_t getMixerRatio();
         static uint8_t getPrintStatus();
 
+        // receive variables
+        static UiCommand receivedCommands[MAX_RECEIVE_COMMANDS];
+        static uint8_t receivedCommandsCount;
+        // receive methods
         static void receiveCommands();
         static String receiveCommandString();
         static UiCommand parseCommandString(const String commandString);
         static CommandType parseCommandType(const String commandString);
         static void parseCommandParameters(UiCommand *command, String commandString);
 
+        // handle
         static void handleGcode(const String *command);
         static void handleUnkownCommand(const UiCommand *command);
         static void handleProprietaryCommand(const UiCommand *command);
 
+        // M2120
+        static bool simulatedAutoLevelSwitchOn;
         static void handleM2120(const UiCommand *command);
     };
 

@@ -1,0 +1,152 @@
+/**
+ * Marlin 3D Printer Firmware
+ * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
+ *
+ * Based on Sprinter and grbl.
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
+/**
+ * lcd/extui/geeetech_a30t/geeetech_a30t_send.cpp
+ *
+ * This handles sending status to the display
+ * 
+ * written in 2021 by TheThomasD
+ */
+
+#include "../../../inc/MarlinConfigPre.h"
+
+#if ENABLED(GEEETECH_A30T_TFT)
+
+#include "geeetech_a30t.h"
+#include "../ui_api.h"
+#include "../../marlinui.h"
+
+using namespace ExtUI;
+
+namespace Geeetech
+{
+    millis_t TouchDisplay::nextStatusSend = 0;
+
+    void TouchDisplay::setNextSendMs(const millis_t *currentTimeMs) { nextStatusSend = *currentTimeMs; }
+
+    void TouchDisplay::sendStatusIfNeeded(const millis_t *currentTimeMs)
+    {
+        if (ELAPSED(currentTimeMs, nextStatusSend))
+        {
+            sendL1AxisInfo();
+            delay(20);
+            sendL2TempInfo();
+            delay(20);
+            sendL3PrintInfo();
+            delay(20);
+            nextStatusSend = *currentTimeMs + STATUS_CYCLE_IN_MS;
+        }
+    }
+
+    void TouchDisplay::sendL1AxisInfo()
+    {
+        char x[8], y[8], z[8]; // 6 digits + dot + \0
+
+        dtostrf(getAxisPosition_mm(X), 0, 3, x);
+        dtostrf(getAxisPosition_mm(Y), 0, 3, y);
+        dtostrf(getAxisPosition_mm(Z), 0, 3, z);
+
+        char output[10 + 3 * 7 + 3 + 1]; // 10 chars + 3*7 XYZ + 3 F + \0
+        sprintf(output, "L1 X%s Y%s Z%s F%d",
+                x /*7*/, y /*7*/, z /*7*/, FEEDRATE /*3*/);
+        sendToDisplay(PSTR(output));
+    }
+
+    void TouchDisplay::sendL2TempInfo()
+    {
+        char bedCurrentTemp[6], bedTargetTemp[6], // 4 digits + dot + \0
+            e0CurrentTemp[6], e0TargetTemp[6];
+
+        dtostrf(getActualTemp_celsius(BED), 0, 1, bedCurrentTemp);
+        dtostrf(getTargetTemp_celsius(BED), 0, 1, bedTargetTemp);
+        dtostrf(getActualTemp_celsius(E0), 0, 1, e0CurrentTemp);
+        dtostrf(getTargetTemp_celsius(E0), 0, 1, e0TargetTemp);
+
+        char output[54 + 8 * 5 + 5 * 1 + 3 * 3 + 1];
+        sprintf(output, "L2 B:%s /%s /%d T0:%s /%s /%d T1:%s /%s /%d T2:%s /%s /%d SD:%d F0:%d F2:50 R:%d FR:%d",
+                bedCurrentTemp /*5*/, bedTargetTemp /*5*/, BED_ACTIVE /*1*/,
+                e0CurrentTemp /*5*/, e0TargetTemp /*5*/, E0_ACTIVE /*1*/,
+                e0CurrentTemp /*5*/, e0TargetTemp /*5*/, E0_ACTIVE /*1*/,
+                e0CurrentTemp /*5*/, e0TargetTemp /*5*/, E0_ACTIVE /*1*/,
+                SD_ACTIVE /*1*/, F0_SPEED /*3*/, PRINT_SPEED /*3*/, FEEDRATE /*3*/);
+
+        sendToDisplay(PSTR(output));
+    }
+
+    uint32_t TouchDisplay::getMixerRatio()
+    {
+        uint32_t result = mixer.mix[2];
+        result = (result << 7) + mixer.mix[1];
+        result = (result << 7) + mixer.mix[0];
+        return result;
+    }
+
+    uint8_t TouchDisplay::getPrintStatus()
+    {
+        if (printJobOngoing() || isPrintingFromMedia())
+            return PRINT_STATUS_PRINTING;
+        else if (isPrintingPaused() || isPrintingFromMediaPaused())
+            return PRINT_STATUS_PAUSED;
+        else if (card.isFileOpen() && card.eof())
+            return PRINT_STATUS_FINISHED;
+        return PRINT_STATUS_IDLE;
+    }
+
+    void TouchDisplay::sendL3PrintInfo()
+    {
+        char output[59 + 3 * 1 + 2 * 3 + 7 + 12 + 6 + 1];
+        sprintf(output, "L3 PS:%d VL:0 MT:%d FT:%d AL:%d ST:1 WF:0 MR:%ld FN:%s PG:%d TM:%ld LA:0 LC:0",
+                getPrintStatus() /*1*/, MOTOR_TENSION_STATUS /*1*/, FILAMENT_SENSOR_STATUS /*3*/,
+                simulatedAutoLevelSwitchOn /*1*/, getMixerRatio() /*7*/, CURRENT_FILENAME /*12*/,
+                getProgress_percent() /*3*/, getProgress_seconds_elapsed() /*6*/);
+
+        sendToDisplay(PSTR(output));
+    }
+
+    void TouchDisplay::sendToDisplay(PGM_P message, const bool addChecksum)
+    {
+        if (addChecksum)
+        {
+            LCD_SERIAL.write("N-0 ");
+
+            uint8_t checksum = 115; // checksum of line sent above
+            for (unsigned int i = 0; i < strlen(message); i++)
+            {
+                checksum ^= message[i];
+                LCD_SERIAL.write(message[i]);
+            }
+            char number[5];
+            sprintf(number, "*%d", checksum);
+            LCD_SERIAL.write(number);
+        }
+        else
+        {
+            LCD_SERIAL.write(message);
+        }
+
+        LCD_SERIAL.write("\r\n");
+    }
+
+} // namespace Geeetech
+
+#endif // GEEETECH_A30T_TFT

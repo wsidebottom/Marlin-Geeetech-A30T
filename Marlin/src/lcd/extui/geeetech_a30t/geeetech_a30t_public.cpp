@@ -63,7 +63,7 @@ namespace Geeetech
     void TouchDisplay::process()
     {
         const millis_t currentTimeMs = millis();
-        sendStatusIfNeeded(&currentTimeMs);
+        sendStatusIfNeeded(currentTimeMs);
 
         receiveCommands();
 
@@ -81,15 +81,15 @@ namespace Geeetech
                 break;
 
             if (GCode == command.type)
-                handleGcode(&(command.command));
+                handleGcode(command.command);
             else if (Unknown == command.type)
-                handleUnkownCommand(&command);
+                handleUnkownCommand(command);
             else
-                handleProprietaryCommand(&command);
+                handleProprietaryCommand(command);
 
             // schedule an immediate answer, if needed
             if (false FOREACH_ANSWER(command.type, GENERATE_BOOL_COMPARE))
-                setNextSendMs(&currentTimeMs);
+                setNextSendMs(currentTimeMs);
         }
     }
 

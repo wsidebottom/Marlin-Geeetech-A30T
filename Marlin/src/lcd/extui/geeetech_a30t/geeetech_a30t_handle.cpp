@@ -41,24 +41,24 @@ using namespace ExtUI;
 namespace Geeetech
 {
 
-    void TouchDisplay::handleGcode(const String *gcode)
+    void TouchDisplay::handleGcode(const String &gcode)
     {
 #ifdef GEEETECH_DISPLAY_DEBUG
-        SERIAL_ECHOLNPGM("Queueing command: ", gcode->c_str());
+        SERIAL_ECHOLNPGM("Queueing command: ", gcode.c_str());
 #endif
-        queue.enqueue_now_P(PSTR(gcode->c_str()));
+        queue.enqueue_now_P(PSTR(gcode.c_str()));
     }
 
-    void TouchDisplay::handleUnkownCommand(const UiCommand *command)
+    void TouchDisplay::handleUnkownCommand(const UiCommand &command)
     {
 #ifdef GEEETECH_DISPLAY_DEBUG
-        SERIAL_ECHOLNPGM("Unknown command ignored: ", command->command.c_str());
+        SERIAL_ECHOLNPGM("Unknown command ignored: ", command.command.c_str());
 #endif
     }
 
-    void TouchDisplay::handleProprietaryCommand(const UiCommand *command)
+    void TouchDisplay::handleProprietaryCommand(const UiCommand &command)
     {
-        switch (command->type)
+        switch (command.type)
         {
         case M2120:
             handleM2120(command);
@@ -68,7 +68,7 @@ namespace Geeetech
             break;
         default:
 #ifdef GEEETECH_DISPLAY_DEBUG
-            SERIAL_ECHOLNPGM("Command not handled: ", COMMAND_STRINGS[command->type]);
+            SERIAL_ECHOLNPGM("Command not handled: ", COMMAND_STRINGS[command.type]);
 #endif
             break;
         }

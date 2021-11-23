@@ -97,14 +97,14 @@ namespace Geeetech
         static millis_t nextTempDataUpdate;
         static char bedCurrentTemp[6], bedTargetTemp[6], e0CurrentTemp[6], e0TargetTemp[6];
         //status methods
-        static void updateTempDataIfNeeded(const millis_t *currentTimeMs);
+        static void updateTempDataIfNeeded(const millis_t &currentTimeMs);
 
         // send variables
         static millis_t nextStatusSend;
 
         // send methods
-        static void setNextSendMs(const millis_t *currentTimeMs);
-        static void sendStatusIfNeeded(const millis_t *currentTimeMs);
+        static void setNextSendMs(const millis_t &currentTimeMs);
+        static void sendStatusIfNeeded(const millis_t &currentTimeMs);
         static void sendL1AxisInfo();
         static void sendL2TempInfo();
         static void sendL3PrintInfo();
@@ -119,21 +119,22 @@ namespace Geeetech
         // receive methods
         static void receiveCommands();
         static String receiveCommandString();
-        static UiCommand parseCommandString(const String commandString);
-        static CommandType parseCommandType(const String commandString);
-        static void parseCommandParameters(UiCommand *command, String commandString);
+        static UiCommand parseCommandString(const String &commandString);
+        static CommandType parseCommandType(const String &commandString);
+        static void parseCommandParameters(UiCommand &command, const String &commandString);
 
         // handle
-        static void handleGcode(const String *command);
-        static void handleUnkownCommand(const UiCommand *command);
-        static void handleProprietaryCommand(const UiCommand *command);
+        static void handleGcode(const String &command);
+        static void handleUnkownCommand(const UiCommand &command);
+        static void handleProprietaryCommand(const UiCommand &command);
 
         // M2120
         static bool simulatedAutoLevelSwitchOn;
-        static void handleM2120(const UiCommand *command);
+        static void handleM2120(const UiCommand &command);
+        static void handleM2120P1(const char &sParameter);
 
         // M2134
-        static void handleM2134(const UiCommand *command);
+        static void handleM2134(const UiCommand &command);
     };
 
     extern TouchDisplay Display;

@@ -40,7 +40,7 @@ using namespace ExtUI;
 
 namespace Geeetech
 {
-    UiCommand TouchDisplay::parseCommandString(const String commandString)
+    UiCommand TouchDisplay::parseCommandString(const String &commandString)
     {
         UiCommand result = {}; // init
         result.type = parseCommandType(commandString);
@@ -48,14 +48,14 @@ namespace Geeetech
         if (GCode == result.type)
             result.command = commandString;
         else if (Unknown != result.type)
-            parseCommandParameters(&result, commandString);
+            parseCommandParameters(result, commandString);
 
         return result;
     }
 
-    void TouchDisplay::parseCommandParameters(UiCommand *command, const String commandString)
+    void TouchDisplay::parseCommandParameters(UiCommand &command, const String &commandString)
     {
-        String currentCommand = COMMAND_STRINGS[command->type];
+        String currentCommand = COMMAND_STRINGS[command.type];
         if (commandString.length() + 1 <= currentCommand.length())
             return; // no parameters detected
 
@@ -72,19 +72,19 @@ namespace Geeetech
                 int index = parameterString.indexOf(' ');
                 if (index > substringStart)
                 {
-                    command->parameters[i] = parameterString.substring(substringStart, index);
+                    command.parameters[i] = parameterString.substring(substringStart, index);
                     parameterString = parameterString.substring(index);
                 }
                 else
                 {
-                    command->parameters[i] = parameterString.substring(substringStart);
+                    command.parameters[i] = parameterString.substring(substringStart);
                     break;
                 }
             }
         }
     }
 
-    CommandType TouchDisplay::parseCommandType(const String commandString)
+    CommandType TouchDisplay::parseCommandType(const String &commandString)
     {
         const char firstChar = commandString.charAt(0);
 

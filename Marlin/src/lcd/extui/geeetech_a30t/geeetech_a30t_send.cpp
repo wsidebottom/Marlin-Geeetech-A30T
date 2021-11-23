@@ -42,16 +42,16 @@ namespace Geeetech
 {
     millis_t TouchDisplay::nextStatusSend = 0;
 
-    void TouchDisplay::setNextSendMs(const millis_t *currentTimeMs) { nextStatusSend = *currentTimeMs; }
+    void TouchDisplay::setNextSendMs(const millis_t &currentTimeMs) { nextStatusSend = currentTimeMs; }
 
-    void TouchDisplay::sendStatusIfNeeded(const millis_t *currentTimeMs)
+    void TouchDisplay::sendStatusIfNeeded(const millis_t &currentTimeMs)
     {
-        if (ELAPSED(*currentTimeMs, nextStatusSend))
+        if (ELAPSED(currentTimeMs, nextStatusSend))
         {
             sendL1AxisInfo();
             sendL2TempInfo();
             sendL3PrintInfo();
-            nextStatusSend = *currentTimeMs + SEND_CYCLE_IN_MS;
+            nextStatusSend = currentTimeMs + SEND_CYCLE_IN_MS;
         }
     }
 

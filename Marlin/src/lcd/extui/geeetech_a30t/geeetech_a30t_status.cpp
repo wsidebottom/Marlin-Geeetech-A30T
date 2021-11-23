@@ -46,16 +46,16 @@ namespace Geeetech
     char TouchDisplay::e0CurrentTemp[] = {};
     char TouchDisplay::e0TargetTemp[] = {};
 
-    void TouchDisplay::updateTempDataIfNeeded(const millis_t *currentTimeMs)
+    void TouchDisplay::updateTempDataIfNeeded(const millis_t &currentTimeMs)
     {
-        if (ELAPSED(*currentTimeMs, nextTempDataUpdate))
+        if (ELAPSED(currentTimeMs, nextTempDataUpdate))
         {
             dtostrf(getActualTemp_celsius(BED), 0, 1, bedCurrentTemp);
             dtostrf(getTargetTemp_celsius(BED), 0, 1, bedTargetTemp);
             dtostrf(getActualTemp_celsius(E0), 0, 1, e0CurrentTemp);
             dtostrf(getTargetTemp_celsius(E0), 0, 1, e0TargetTemp);
 
-            nextTempDataUpdate = *currentTimeMs + TEMP_STATUS_CYCLE_IN_MS;
+            nextTempDataUpdate = currentTimeMs + TEMP_STATUS_CYCLE_IN_MS;
         }
     }
 

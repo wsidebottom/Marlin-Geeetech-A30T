@@ -41,19 +41,20 @@ using namespace ExtUI;
 namespace Geeetech
 {
     millis_t TouchDisplay::nextStatusSend = 0;
+    char TouchDisplay::bedCurrentTemp[] = {}; // 4 digits + dot + null
+    char TouchDisplay::bedTargetTemp[] = {};
+    char TouchDisplay::e0CurrentTemp[] = {};
+    char TouchDisplay::e0TargetTemp[] = {};
 
     void TouchDisplay::setNextSendMs(const millis_t *currentTimeMs) { nextStatusSend = *currentTimeMs; }
 
     void TouchDisplay::sendStatusIfNeeded(const millis_t *currentTimeMs)
     {
-        if (ELAPSED(currentTimeMs, nextStatusSend))
+        if (ELAPSED(*currentTimeMs, nextStatusSend))
         {
-            sendL1AxisInfo();
-            delay(20);
+            //            sendL1AxisInfo();
             sendL2TempInfo();
-            delay(20);
-            sendL3PrintInfo();
-            delay(20);
+            //            sendL3PrintInfo();
             nextStatusSend = *currentTimeMs + STATUS_CYCLE_IN_MS;
         }
     }
@@ -74,9 +75,6 @@ namespace Geeetech
 
     void TouchDisplay::sendL2TempInfo()
     {
-        char bedCurrentTemp[6], bedTargetTemp[6], // 4 digits + dot + \0
-            e0CurrentTemp[6], e0TargetTemp[6];
-
         dtostrf(getActualTemp_celsius(BED), 0, 1, bedCurrentTemp);
         dtostrf(getTargetTemp_celsius(BED), 0, 1, bedTargetTemp);
         dtostrf(getActualTemp_celsius(E0), 0, 1, e0CurrentTemp);
@@ -123,8 +121,18 @@ namespace Geeetech
         sendToDisplay(PSTR(output));
     }
 
+    void TouchDisplay::sendL9FirmwareInfo()
+    {
+        char output[81 + 30 + 1];
+        sprintf(output, "L9 DN:Geeetech;DM:A30T;SN:TheThomasD;FV:%s;PV:320.00 x 320.00 x 420.00;HV:GTM32_103_V1;", getFirmwareName_str());
+
+        sendToDisplay(PSTR(output));
+    }
+
     void TouchDisplay::sendToDisplay(PGM_P message, const bool addChecksum)
     {
+        MYSERIAL1.print("Sending: ");
+        MYSERIAL1.println(message);
         if (addChecksum)
         {
             LCD_SERIAL.write("N-0 ");
@@ -145,6 +153,7 @@ namespace Geeetech
         }
 
         LCD_SERIAL.write("\r\n");
+        delay(20);
     }
 
 } // namespace Geeetech

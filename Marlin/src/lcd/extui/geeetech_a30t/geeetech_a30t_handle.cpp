@@ -52,15 +52,25 @@ namespace Geeetech
     void TouchDisplay::handleUnkownCommand(const UiCommand *command)
     {
 #ifdef GEEETECH_DISPLAY_DEBUG
-        SERIAL_ECHOLNPGM("Unknown command ignored!");
+        SERIAL_ECHOLNPGM("Unknown command ignored: ", command->command.c_str());
 #endif
     }
 
     void TouchDisplay::handleProprietaryCommand(const UiCommand *command)
     {
-        if (M2120 == command->type)
+        switch (command->type)
         {
+        case M2120:
             handleM2120(command);
+            break;
+        case M2134:
+            handleM2134(command);
+            break;
+        default:
+#ifdef GEEETECH_DISPLAY_DEBUG
+            SERIAL_ECHOLNPGM("Command not handled: ", COMMAND_STRINGS[command->type]);
+#endif
+            break;
         }
     }
 

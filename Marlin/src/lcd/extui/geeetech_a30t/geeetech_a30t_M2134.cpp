@@ -21,9 +21,9 @@
  */
 
 /**
- * lcd/extui/geeetech_a30t/geeetech_a30t_M2120.cpp
+ * lcd/extui/geeetech_a30t/geeetech_a30t_M2134.cpp
  *
- * This file implements the M2120 command controling the autoleveling
+ * This file implements the M2134 command for receiving the LCD firmware
  *  
  * written in 2021 by TheThomasD
  */
@@ -40,19 +40,12 @@ using namespace ExtUI;
 
 namespace Geeetech
 {
-    void TouchDisplay::handleM2120(const UiCommand *command)
+    void TouchDisplay::handleM2134(const UiCommand *command)
     {
-        switch (command->parameters[P].charAt(0))
-        {
-        case '0':
-            simulatedAutoLevelSwitchOn = '1' == command->parameters[S].charAt(0);
-            break;
-        default:
 #ifdef GEEETECH_DISPLAY_DEBUG
-            SERIAL_ECHOLNPGM("Did not handle M2120 with P", command->parameters[P].charAt(0));
+        SERIAL_ECHOLNPGM("Firmware info from display: ", command->parameters[FW].c_str());
 #endif
-            break;
-        }
+        sendL9FirmwareInfo();
     }
 } // namespace Geeetech
 

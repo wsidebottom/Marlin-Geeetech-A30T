@@ -28,7 +28,7 @@
 // settings
 #define GEEETECH_DISPLAY_DEBUG // comment out for production
 #define MAX_RECEIVE_COMMANDS 10
-#define STATUS_CYCLE_IN_MS 1000
+#define STATUS_CYCLE_IN_MS 3000
 
 // enum, string array, count, boolean generation
 #define GENERATE_ENUM(ENUM) ENUM,
@@ -40,7 +40,8 @@
 #define FOREACH_COMMAND(COMMAND) \
     COMMAND(Unknown)             \
     COMMAND(GCode)               \
-    COMMAND(M2120)
+    COMMAND(M2120)               \
+    COMMAND(M2134)
 
 // parameter enum
 #define FOREACH_PARAMETER(PARAM) \
@@ -56,7 +57,6 @@
 #define FOREACH_ANSWER(PARAMETER, COMMAND) \
     COMMAND(PARAMETER, M2120)
 
-
 // status values
 #define PRINT_STATUS_IDLE 0
 #define PRINT_STATUS_PRINTING 1
@@ -71,7 +71,7 @@
 #define FEEDRATE (uint8_t) round(ExtUI::getFeedrate_mm_s())
 #define BED_ACTIVE thermalManager.isHeatingBed()
 #define E0_ACTIVE thermalManager.isHeatingHotend(0)
-#define SD_ACTIVE !isMediaInserted()
+#define SD_ACTIVE isMediaInserted()
 #define F0_SPEED (uint8_t) round(getActualFan_percent(FAN0))
 #define PRINT_SPEED (uint8_t) round(getFeedrate_percent())
 #define FILAMENT_SENSOR_STATUS getFilamentRunoutEnabled()        \

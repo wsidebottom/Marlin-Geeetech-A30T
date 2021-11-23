@@ -95,12 +95,15 @@ namespace Geeetech
 
         // send variables
         static millis_t nextStatusSend;
+        static char bedCurrentTemp[6], bedTargetTemp[6], // 4 digits + dot + \0
+            e0CurrentTemp[6], e0TargetTemp[6];
         // send methods
         static void setNextSendMs(const millis_t *currentTimeMs);
         static void sendStatusIfNeeded(const millis_t *currentTimeMs);
         static void sendL1AxisInfo();
         static void sendL2TempInfo();
         static void sendL3PrintInfo();
+        static void sendL9FirmwareInfo();
         static void sendToDisplay(PGM_P message, const bool addChecksum = true);
         static uint32_t getMixerRatio();
         static uint8_t getPrintStatus();
@@ -123,6 +126,9 @@ namespace Geeetech
         // M2120
         static bool simulatedAutoLevelSwitchOn;
         static void handleM2120(const UiCommand *command);
+
+        // M2134
+        static void handleM2134(const UiCommand *command);
     };
 
     extern TouchDisplay Display;

@@ -41,10 +41,6 @@ using namespace ExtUI;
 namespace Geeetech
 {
     millis_t TouchDisplay::nextStatusSend = 0;
-    char TouchDisplay::bedCurrentTemp[] = {}; // 4 digits + dot + null
-    char TouchDisplay::bedTargetTemp[] = {};
-    char TouchDisplay::e0CurrentTemp[] = {};
-    char TouchDisplay::e0TargetTemp[] = {};
 
     void TouchDisplay::setNextSendMs(const millis_t *currentTimeMs) { nextStatusSend = *currentTimeMs; }
 
@@ -52,10 +48,10 @@ namespace Geeetech
     {
         if (ELAPSED(*currentTimeMs, nextStatusSend))
         {
-            //            sendL1AxisInfo();
+            sendL1AxisInfo();
             sendL2TempInfo();
-            //            sendL3PrintInfo();
-            nextStatusSend = *currentTimeMs + STATUS_CYCLE_IN_MS;
+            sendL3PrintInfo();
+            nextStatusSend = *currentTimeMs + SEND_CYCLE_IN_MS;
         }
     }
 
@@ -75,11 +71,6 @@ namespace Geeetech
 
     void TouchDisplay::sendL2TempInfo()
     {
-        dtostrf(getActualTemp_celsius(BED), 0, 1, bedCurrentTemp);
-        dtostrf(getTargetTemp_celsius(BED), 0, 1, bedTargetTemp);
-        dtostrf(getActualTemp_celsius(E0), 0, 1, e0CurrentTemp);
-        dtostrf(getTargetTemp_celsius(E0), 0, 1, e0TargetTemp);
-
         char output[54 + 8 * 5 + 5 * 1 + 3 * 3 + 1];
         sprintf(output, "L2 B:%s /%s /%d T0:%s /%s /%d T1:%s /%s /%d T2:%s /%s /%d SD:%d F0:%d F2:50 R:%d FR:%d",
                 bedCurrentTemp /*5*/, bedTargetTemp /*5*/, BED_ACTIVE /*1*/,
@@ -89,25 +80,6 @@ namespace Geeetech
                 SD_ACTIVE /*1*/, F0_SPEED /*3*/, PRINT_SPEED /*3*/, FEEDRATE /*3*/);
 
         sendToDisplay(PSTR(output));
-    }
-
-    uint32_t TouchDisplay::getMixerRatio()
-    {
-        uint32_t result = mixer.mix[2];
-        result = (result << 7) + mixer.mix[1];
-        result = (result << 7) + mixer.mix[0];
-        return result;
-    }
-
-    uint8_t TouchDisplay::getPrintStatus()
-    {
-        if (printJobOngoing() || isPrintingFromMedia())
-            return PRINT_STATUS_PRINTING;
-        else if (isPrintingPaused() || isPrintingFromMediaPaused())
-            return PRINT_STATUS_PAUSED;
-        else if (card.isFileOpen() && card.eof())
-            return PRINT_STATUS_FINISHED;
-        return PRINT_STATUS_IDLE;
     }
 
     void TouchDisplay::sendL3PrintInfo()

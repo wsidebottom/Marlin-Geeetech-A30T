@@ -93,10 +93,15 @@ namespace Geeetech
     private:
         static bool ignoreIncomingCommands;
 
+        //status variables
+        static millis_t nextTempDataUpdate;
+        static char bedCurrentTemp[6], bedTargetTemp[6], e0CurrentTemp[6], e0TargetTemp[6];
+        //status methods
+        static void updateTempDataIfNeeded(const millis_t *currentTimeMs);
+
         // send variables
         static millis_t nextStatusSend;
-        static char bedCurrentTemp[6], bedTargetTemp[6], // 4 digits + dot + \0
-            e0CurrentTemp[6], e0TargetTemp[6];
+
         // send methods
         static void setNextSendMs(const millis_t *currentTimeMs);
         static void sendStatusIfNeeded(const millis_t *currentTimeMs);

@@ -40,16 +40,36 @@ using namespace ExtUI;
 
 namespace Geeetech
 {
-    void TouchDisplay::handleM2120(const UiCommand &command)
+    void TouchDisplay::handleM2120_AutoLeveling(const UiCommand &command)
     {
         switch (command.parameters[P].charAt(0))
         {
-        case '0':
+        case '0': // auto leveling on/off
             simulatedAutoLevelSwitchOn = '1' == command.parameters[S].charAt(0);
+            sendL11ZOffset();
             break;
-        case '1':
-            handleM2120P1(command.parameters[S].charAt(0));
+        case '1': // control probe
+            handleM2120_P1_ProbeControl(command.parameters[S].charAt(0));
             break;
+        case '2': // store Z offset value
+            handleM2120_P2_StoreZOffset(command.parameters[S]);
+            break;
+        case '3': // offset up
+            handleM2120_P3_MoveUp(command.parameters[S].charAt(0));
+            break;
+        case '4': // offset down
+            handleM2120_P4_MoveDown(command.parameters[S].charAt(0));
+            break;
+        case '5': // request Z offset value
+            sendL11ZOffset();
+            break;
+        case '6': // move nozzle to center
+            handleM2120_P6_CenterNozzle();
+            break;
+        case '7': // move probe to center and measure
+            handleM2120_P7_ProbeCenter();
+            break;
+        case '9': // select CAS/BLtouch
         default:
 #ifdef GEEETECH_DISPLAY_DEBUG
             SERIAL_ECHOLNPGM("Did not handle M2120 with P", command.parameters[P].charAt(0));
@@ -58,7 +78,7 @@ namespace Geeetech
         }
     }
 
-    void TouchDisplay::handleM2120P1(const char &sParameter)
+    void TouchDisplay::handleM2120_P1_ProbeControl(const char &sParameter)
     {
         // BLtouch control
         switch (sParameter)
@@ -69,11 +89,66 @@ namespace Geeetech
         case '1':                // pin down
             handleGcode("M401"); // deploy probe
             break;
-        default:                         // alarm release ('2')
+        default:                         // alarm release (case '2')
             handleGcode("M280 P0 S160"); // control servo
             break;
         }
     }
+
+    void TouchDisplay::handleM2120_P2_StoreZOffset(const String &sParameter)
+    {
+        setZOffset_mm(strtof(sParameter.c_str(), nullptr));
+        sendL11ZOffset();
+    }
+
+    void TouchDisplay::handleM2120_P3_MoveUp(const char &sParameter)
+    {
+        handleGcode("G91\nG0 Z" + mapSParameterToHeightString(sParameter) + "\nG90");
+    }
+
+    void TouchDisplay::handleM2120_P4_MoveDown(const char &sParameter)
+    {
+        handleGcode("G91\nG0 Z-" + mapSParameterToHeightString(sParameter) + "\nG90");
+    }
+
+    void TouchDisplay::handleM2120_P6_CenterNozzle()
+    {
+        String gcode = "G0 X%s Y%s";
+        if (!isMachineHomed())
+            gcode = "G28\n" + gcode;
+
+        sprintf(output, gcode.c_str(), xCenterString, yCenterString);
+
+        handleGcode(output);
+    }
+
+    void TouchDisplay::handleM2120_P7_ProbeCenter()
+    {
+        String gcode = "G30 X%s Y%s";
+        if (!isMachineHomed())
+            gcode = "G28\n" + gcode;
+
+        sprintf(output, gcode.c_str(), xCenterString, yCenterString);
+
+        handleGcode(output);
+    }
+
+    String TouchDisplay::mapSParameterToHeightString(const char &sParameter)
+    {
+        switch (sParameter)
+        {
+        case '0':
+            return "10";
+        case '1':
+            return "1";
+        case '2':
+            return "0.1";
+        case '3':
+        default:
+            return "0.05";
+        }
+    }
+
 } // namespace Geeetech
 
 #endif // GEEETECH_A30T_TFT

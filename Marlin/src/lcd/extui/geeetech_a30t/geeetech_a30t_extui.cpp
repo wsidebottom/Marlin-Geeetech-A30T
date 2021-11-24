@@ -57,8 +57,8 @@ namespace ExtUI
 
   void onUserConfirmRequired(const char *const msg){};
 
-  void onHomingStart() { Display.ignoreCommands(true); }
-  void onHomingComplete() { Display.ignoreCommands(false); }
+  void onHomingStart() { Display.waitForCommand(true); }
+  void onHomingComplete() { Display.waitForCommand(false); }
 
   void onFactoryReset() {}
   void onStoreSettings(char *) {}
@@ -71,7 +71,7 @@ namespace ExtUI
   void onMeshUpdate(const int8_t xpos, const int8_t ypos, const_float_t zval) {}
   void onMeshUpdate(const int8_t xpos, const int8_t ypos, const ExtUI::probe_state_t state)
   {
-    Display.ignoreCommands(ExtUI::probe_state_t::G29_FINISH == state);
+    Display.waitForCommand(ExtUI::probe_state_t::G29_FINISH == state);
   }
 
   void onPowerLossResume() {}

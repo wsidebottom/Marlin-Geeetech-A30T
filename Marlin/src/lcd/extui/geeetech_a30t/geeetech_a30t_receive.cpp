@@ -40,14 +40,9 @@ using namespace ExtUI;
 
 namespace Geeetech
 {
-    UiCommand TouchDisplay::receivedCommands[] = {};
-    uint8_t TouchDisplay::receivedCommandsCount = 0;
-
-    void TouchDisplay::receiveCommands()
+    UiCommand TouchDisplay::receiveCommand()
     {
-        receivedCommandsCount = 0;
-        while (receivedCommandsCount < MAX_RECEIVE_COMMANDS && LCD_SERIAL.available())
-            receivedCommands[receivedCommandsCount++] = parseCommandString(receiveCommandString());
+        return parseCommandString(receiveCommandString());
     }
 
     String TouchDisplay::receiveCommandString()

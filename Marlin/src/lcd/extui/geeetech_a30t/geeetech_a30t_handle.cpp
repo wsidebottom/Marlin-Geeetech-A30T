@@ -61,7 +61,7 @@ namespace Geeetech
         switch (command.type)
         {
         case M2120:
-            handleM2120(command);
+            handleM2120_AutoLeveling(command);
             break;
         case M2134:
             handleM2134(command);

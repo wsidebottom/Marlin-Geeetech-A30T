@@ -39,11 +39,17 @@ using namespace ExtUI;
 
 namespace Geeetech
 {
-    bool TouchDisplay::ignoreIncomingCommands = false;
+    bool TouchDisplay::shouldWaitForCommand = false;
     bool TouchDisplay::simulatedAutoLevelSwitchOn = true;
+    char TouchDisplay::xCenterString[] = {};
+    char TouchDisplay::yCenterString[] = {};
 
     void TouchDisplay::startup()
     {
+        // set variables
+        dtostrf(X_CENTER, 0, 2, xCenterString);
+        dtostrf(Y_CENTER, 0, 2, yCenterString);
+
         // use pin PD12 (60) as output and pull it up to supply 5V power
         SET_OUTPUT(60);
         WRITE(60, 1);
@@ -58,27 +64,24 @@ namespace Geeetech
 #endif
     }
 
-    void TouchDisplay::ignoreCommands(const bool ignore) { ignoreIncomingCommands = ignore; }
+    void TouchDisplay::waitForCommand(const bool wait) { shouldWaitForCommand = wait; }
 
     void TouchDisplay::process()
     {
         const millis_t currentTimeMs = millis();
+        updateTemperatureDataIfNeeded(currentTimeMs);
         sendStatusIfNeeded(currentTimeMs);
 
-        receiveCommands();
-
-        for (uint8_t i = 0; !ignoreIncomingCommands && i < receivedCommandsCount; i++)
+        if (LCD_SERIAL.available() && !shouldWaitForCommand)
         {
-            UiCommand command = receivedCommands[i];
+            UiCommand command = receiveCommand();
+
 #ifdef GEEETECH_DISPLAY_DEBUG
             SERIAL_ECHOLNPGM("CommandType: ", COMMAND_STRINGS[command.type]);
             SERIAL_ECHOLNPGM("String: ", command.command.c_str());
             for (uint8_t j = 0; j < PARAMETERS_COUNT; j++)
                 SERIAL_ECHOLNPGM(PARAMETER_STRINGS[j], command.parameters[j].c_str());
 #endif
-
-            if (ignoreIncomingCommands)
-                break;
 
             if (GCode == command.type)
                 handleGcode(command.command);

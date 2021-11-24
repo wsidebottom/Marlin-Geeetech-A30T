@@ -27,9 +27,8 @@
 
 // settings
 #define GEEETECH_DISPLAY_DEBUG // comment out for production
-#define MAX_RECEIVE_COMMANDS 10
 #define SEND_CYCLE_IN_MS 1000
-#define TEMP_STATUS_CYCLE_IN_MS 3000
+#define TEMP_STATUS_CYCLE_IN_MS 2000
 
 // enum, string array, count, boolean generation
 #define GENERATE_ENUM(ENUM) ENUM,

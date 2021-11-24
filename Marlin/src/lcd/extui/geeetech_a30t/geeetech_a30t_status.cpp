@@ -46,7 +46,7 @@ namespace Geeetech
     char TouchDisplay::e0CurrentTemp[] = {};
     char TouchDisplay::e0TargetTemp[] = {};
 
-    void TouchDisplay::updateTempDataIfNeeded(const millis_t &currentTimeMs)
+    void TouchDisplay::updateTemperatureDataIfNeeded(const millis_t &currentTimeMs)
     {
         if (ELAPSED(currentTimeMs, nextTempDataUpdate))
         {

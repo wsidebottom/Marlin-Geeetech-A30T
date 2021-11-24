@@ -41,6 +41,7 @@ using namespace ExtUI;
 namespace Geeetech
 {
     millis_t TouchDisplay::nextStatusSend = 0;
+    char TouchDisplay::output[] = {};
 
     void TouchDisplay::setNextSendMs(const millis_t &currentTimeMs) { nextStatusSend = currentTimeMs; }
 
@@ -63,7 +64,6 @@ namespace Geeetech
         dtostrf(getAxisPosition_mm(Y), 0, 3, y);
         dtostrf(getAxisPosition_mm(Z), 0, 3, z);
 
-        char output[10 + 3 * 7 + 3 + 1]; // 10 chars + 3*7 XYZ + 3 F + \0
         sprintf(output, "L1 X%s Y%s Z%s F%d",
                 x /*7*/, y /*7*/, z /*7*/, FEEDRATE /*3*/);
         sendToDisplay(PSTR(output));
@@ -71,7 +71,6 @@ namespace Geeetech
 
     void TouchDisplay::sendL2TempInfo()
     {
-        char output[54 + 8 * 5 + 5 * 1 + 3 * 3 + 1];
         sprintf(output, "L2 B:%s /%s /%d T0:%s /%s /%d T1:%s /%s /%d T2:%s /%s /%d SD:%d F0:%d F2:50 R:%d FR:%d",
                 bedCurrentTemp /*5*/, bedTargetTemp /*5*/, BED_ACTIVE /*1*/,
                 e0CurrentTemp /*5*/, e0TargetTemp /*5*/, E0_ACTIVE /*1*/,
@@ -84,7 +83,6 @@ namespace Geeetech
 
     void TouchDisplay::sendL3PrintInfo()
     {
-        char output[59 + 3 * 1 + 2 * 3 + 7 + 12 + 6 + 1];
         sprintf(output, "L3 PS:%d VL:0 MT:%d FT:%d AL:%d ST:1 WF:0 MR:%ld FN:%s PG:%d TM:%ld LA:0 LC:0",
                 getPrintStatus() /*1*/, MOTOR_TENSION_STATUS /*1*/, FILAMENT_SENSOR_STATUS /*3*/,
                 simulatedAutoLevelSwitchOn /*1*/, getMixerRatio() /*7*/, CURRENT_FILENAME /*12*/,
@@ -95,16 +93,23 @@ namespace Geeetech
 
     void TouchDisplay::sendL9FirmwareInfo()
     {
-        char output[81 + 30 + 1];
         sprintf(output, "L9 DN:Geeetech;DM:A30T;SN:TheThomasD;FV:%s;PV:320.00 x 320.00 x 420.00;HV:GTM32_103_V1;", getFirmwareName_str());
 
         sendToDisplay(PSTR(output));
     }
 
+    void TouchDisplay::sendL11ZOffset() {
+        char zOffset[7];
+
+        dtostrf(getZOffset_mm(), 0, 2, zOffset);
+
+        sprintf(output, "L11 P0 S%s", zOffset);
+    
+        sendToDisplay(PSTR(output));
+    }
+
     void TouchDisplay::sendToDisplay(PGM_P message, const bool addChecksum)
     {
-        MYSERIAL1.print("Sending: ");
-        MYSERIAL1.println(message);
         if (addChecksum)
         {
             LCD_SERIAL.write("N-0 ");

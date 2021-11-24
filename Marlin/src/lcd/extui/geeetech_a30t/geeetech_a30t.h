@@ -88,20 +88,20 @@ namespace Geeetech
         // public
         static void startup();
         static void process();
-        static void ignoreCommands(const bool ignore);
+        static void waitForCommand(const bool ignore);
 
     private:
-        static bool ignoreIncomingCommands;
+        static bool shouldWaitForCommand;
 
         //status variables
         static millis_t nextTempDataUpdate;
         static char bedCurrentTemp[6], bedTargetTemp[6], e0CurrentTemp[6], e0TargetTemp[6];
         //status methods
-        static void updateTempDataIfNeeded(const millis_t &currentTimeMs);
+        static void updateTemperatureDataIfNeeded(const millis_t &currentTimeMs);
 
         // send variables
         static millis_t nextStatusSend;
-
+        static char output[200]; // should be enough for all message
         // send methods
         static void setNextSendMs(const millis_t &currentTimeMs);
         static void sendStatusIfNeeded(const millis_t &currentTimeMs);
@@ -109,15 +109,13 @@ namespace Geeetech
         static void sendL2TempInfo();
         static void sendL3PrintInfo();
         static void sendL9FirmwareInfo();
+        static void sendL11ZOffset();
         static void sendToDisplay(PGM_P message, const bool addChecksum = true);
         static uint32_t getMixerRatio();
         static uint8_t getPrintStatus();
 
-        // receive variables
-        static UiCommand receivedCommands[MAX_RECEIVE_COMMANDS];
-        static uint8_t receivedCommandsCount;
         // receive methods
-        static void receiveCommands();
+        static UiCommand receiveCommand();
         static String receiveCommandString();
         static UiCommand parseCommandString(const String &commandString);
         static CommandType parseCommandType(const String &commandString);
@@ -130,8 +128,16 @@ namespace Geeetech
 
         // M2120
         static bool simulatedAutoLevelSwitchOn;
-        static void handleM2120(const UiCommand &command);
-        static void handleM2120P1(const char &sParameter);
+        static char xCenterString[7];
+        static char yCenterString[7];
+        static void handleM2120_AutoLeveling(const UiCommand &command);
+        static void handleM2120_P1_ProbeControl(const char &sParameter);
+        static void handleM2120_P2_StoreZOffset(const String &sParameter);
+        static void handleM2120_P3_MoveUp(const char &sParameter);
+        static void handleM2120_P4_MoveDown(const char &sParameter);
+        static void handleM2120_P7_ProbeCenter();
+        static void handleM2120_P6_CenterNozzle();
+        static String mapSParameterToHeightString(const char &sParameter);
 
         // M2134
         static void handleM2134(const UiCommand &command);

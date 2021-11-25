@@ -60,11 +60,17 @@ namespace Geeetech
     {
         switch (command.type)
         {
+        case L101: // return from M2107 manual leveling
+            simulatedAutoLevelSwitchOn = true;
+            break;
+        case M2107:
+            handle_M2107_ManualLeveling(command);
+            break;
         case M2120:
-            handleM2120_AutoLeveling(command);
+            handle_M2120_AutoLeveling(command);
             break;
         case M2134:
-            handleM2134(command);
+            handle_M2134(command);
             break;
         default:
 #ifdef GEEETECH_DISPLAY_DEBUG

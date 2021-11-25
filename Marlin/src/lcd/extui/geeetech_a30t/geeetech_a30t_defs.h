@@ -40,6 +40,8 @@
 #define FOREACH_COMMAND(COMMAND) \
     COMMAND(Unknown)             \
     COMMAND(GCode)               \
+    COMMAND(L101)                \
+    COMMAND(M2107)               \
     COMMAND(M2120)               \
     COMMAND(M2134)
 
@@ -56,6 +58,14 @@
 // commands that need immediate answer
 #define FOREACH_ANSWER(PARAMETER, COMMAND) \
     COMMAND(PARAMETER, M2120)
+
+// manual leveling
+#define MANUAL_LEVELING_POINT_MARGIN 45.00
+#define MANUAL_LEVELING_MOVE_Z_HOP (String) "5"
+#define MANUAL_LEVELING_MOVE_DIRECTION_UP true
+#define MANUAL_LEVELING_MOVE_DIRECTION_DOWN false
+#define MANUAL_LEVELING_MOVE_BIG_STEP true
+#define MANUAL_LEVELING_MOVE_SMALL_STEP false
 
 // status values
 #define PRINT_STATUS_IDLE 0

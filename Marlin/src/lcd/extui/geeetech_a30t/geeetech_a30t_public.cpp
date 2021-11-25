@@ -41,14 +41,39 @@ namespace Geeetech
 {
     bool TouchDisplay::shouldWaitForCommand = false;
     bool TouchDisplay::simulatedAutoLevelSwitchOn = true;
-    char TouchDisplay::xCenterString[] = {};
-    char TouchDisplay::yCenterString[] = {};
+    char TouchDisplay::levelCenter_xPosString[] = {};
+    char TouchDisplay::levelCenter_yPosString[] = {};
+    char TouchDisplay::levelRR_xPosString[] = {};
+    char TouchDisplay::levelRR_yPosString[] = {};
+    char TouchDisplay::levelRL_xPosString[] = {};
+    char TouchDisplay::levelRL_yPosString[] = {};
+    char TouchDisplay::levelFL_xPosString[] = {};
+    char TouchDisplay::levelFL_yPosString[] = {};
+    char TouchDisplay::levelFR_xPosString[] = {};
+    char TouchDisplay::levelFR_yPosString[] = {};
 
     void TouchDisplay::startup()
     {
-        // set variables
-        dtostrf(X_CENTER, 0, 2, xCenterString);
-        dtostrf(Y_CENTER, 0, 2, yCenterString);
+        // set position variables
+        // bed center (also manual leveling pos 5)
+        dtostrf(X_CENTER, 0, 2, levelCenter_xPosString);
+        dtostrf(Y_CENTER, 0, 2, levelCenter_yPosString);
+
+        // manual leveling pos 1 (RR)
+        dtostrf(X_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRR_xPosString);
+        dtostrf(Y_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRR_yPosString);
+
+        // manual leveling pos 1 (RL)
+        dtostrf(X_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRL_xPosString);
+        dtostrf(Y_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRL_yPosString);
+
+        // manual leveling pos 1 (FL)
+        dtostrf(X_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFL_xPosString);
+        dtostrf(Y_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFL_yPosString);
+
+        // manual leveling pos 1 (FR)
+        dtostrf(X_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFR_xPosString);
+        dtostrf(Y_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFR_yPosString);
 
         // use pin PD12 (60) as output and pull it up to supply 5V power
         SET_OUTPUT(60);

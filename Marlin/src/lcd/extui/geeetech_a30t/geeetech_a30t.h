@@ -92,6 +92,8 @@ namespace Geeetech
 
     private:
         static bool shouldWaitForCommand;
+        static char levelCenter_xPosString[7];
+        static char levelCenter_yPosString[7];
 
         //status variables
         static millis_t nextTempDataUpdate;
@@ -105,11 +107,12 @@ namespace Geeetech
         // send methods
         static void setNextSendMs(const millis_t &currentTimeMs);
         static void sendStatusIfNeeded(const millis_t &currentTimeMs);
-        static void sendL1AxisInfo();
-        static void sendL2TempInfo();
-        static void sendL3PrintInfo();
-        static void sendL9FirmwareInfo();
-        static void sendL11ZOffset();
+        static void send_L1_AxisInfo();
+        static void send_L2_TempInfo();
+        static void send_L3_PrintInfo();
+        static void send_L9_FirmwareInfo();
+        static void send_L10_ZOffset();
+        static void send_L11_ProbeZOffset();
         static void sendToDisplay(PGM_P message, const bool addChecksum = true);
         static uint32_t getMixerRatio();
         static uint8_t getPrintStatus();
@@ -126,21 +129,34 @@ namespace Geeetech
         static void handleUnkownCommand(const UiCommand &command);
         static void handleProprietaryCommand(const UiCommand &command);
 
+        // M2107
+        static char levelRR_xPosString[7];
+        static char levelRR_yPosString[7];
+        static char levelRL_xPosString[7];
+        static char levelRL_yPosString[7];
+        static char levelFL_xPosString[7];
+        static char levelFL_yPosString[7];
+        static char levelFR_xPosString[7];
+        static char levelFR_yPosString[7];
+        static void handle_M2107_ManualLeveling(const UiCommand &command);
+        static void handle_M2107_S0_Start();
+        static void handle_M2107_S8_OkSave();
+        static void moveToXYWithZHop(const char *xPos, const char *yPos);
+        static void moveUpDownSmallBigStep(const bool &up, const bool &bigStep);
+
         // M2120
         static bool simulatedAutoLevelSwitchOn;
-        static char xCenterString[7];
-        static char yCenterString[7];
-        static void handleM2120_AutoLeveling(const UiCommand &command);
-        static void handleM2120_P1_ProbeControl(const char &sParameter);
-        static void handleM2120_P2_StoreZOffset(const String &sParameter);
-        static void handleM2120_P3_MoveUp(const char &sParameter);
-        static void handleM2120_P4_MoveDown(const char &sParameter);
-        static void handleM2120_P7_ProbeCenter();
-        static void handleM2120_P6_CenterNozzle();
+        static void handle_M2120_AutoLeveling(const UiCommand &command);
+        static void handle_M2120_P1_ProbeControl(const char &sParameter);
+        static void handle_M2120_P2_StoreZOffset(const String &sParameter);
+        static void handle_M2120_P3_MoveUp(const char &sParameter);
+        static void handle_M2120_P4_MoveDown(const char &sParameter);
+        static void handle_M2120_P7_ProbeCenter();
+        static void handle_M2120_P6_CenterNozzle();
         static String mapSParameterToHeightString(const char &sParameter);
 
         // M2134
-        static void handleM2134(const UiCommand &command);
+        static void handle_M2134(const UiCommand &command);
     };
 
     extern TouchDisplay Display;

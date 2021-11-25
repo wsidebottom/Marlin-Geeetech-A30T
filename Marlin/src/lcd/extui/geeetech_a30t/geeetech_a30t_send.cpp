@@ -49,14 +49,14 @@ namespace Geeetech
     {
         if (ELAPSED(currentTimeMs, nextStatusSend))
         {
-            sendL1AxisInfo();
-            sendL2TempInfo();
-            sendL3PrintInfo();
+            send_L1_AxisInfo();
+            send_L2_TempInfo();
+            send_L3_PrintInfo();
             nextStatusSend = currentTimeMs + SEND_CYCLE_IN_MS;
         }
     }
 
-    void TouchDisplay::sendL1AxisInfo()
+    void TouchDisplay::send_L1_AxisInfo()
     {
         char x[8], y[8], z[8]; // 6 digits + dot + \0
 
@@ -66,10 +66,10 @@ namespace Geeetech
 
         sprintf(output, "L1 X%s Y%s Z%s F%d",
                 x /*7*/, y /*7*/, z /*7*/, FEEDRATE /*3*/);
-        sendToDisplay(PSTR(output));
+        sendToDisplay(output);
     }
 
-    void TouchDisplay::sendL2TempInfo()
+    void TouchDisplay::send_L2_TempInfo()
     {
         sprintf(output, "L2 B:%s /%s /%d T0:%s /%s /%d T1:%s /%s /%d T2:%s /%s /%d SD:%d F0:%d F2:50 R:%d FR:%d",
                 bedCurrentTemp /*5*/, bedTargetTemp /*5*/, BED_ACTIVE /*1*/,
@@ -78,34 +78,46 @@ namespace Geeetech
                 e0CurrentTemp /*5*/, e0TargetTemp /*5*/, E0_ACTIVE /*1*/,
                 SD_ACTIVE /*1*/, F0_SPEED /*3*/, PRINT_SPEED /*3*/, FEEDRATE /*3*/);
 
-        sendToDisplay(PSTR(output));
+        sendToDisplay(output);
     }
 
-    void TouchDisplay::sendL3PrintInfo()
+    void TouchDisplay::send_L3_PrintInfo()
     {
         sprintf(output, "L3 PS:%d VL:0 MT:%d FT:%d AL:%d ST:1 WF:0 MR:%ld FN:%s PG:%d TM:%ld LA:0 LC:0",
                 getPrintStatus() /*1*/, MOTOR_TENSION_STATUS /*1*/, FILAMENT_SENSOR_STATUS /*3*/,
                 simulatedAutoLevelSwitchOn /*1*/, getMixerRatio() /*7*/, CURRENT_FILENAME /*12*/,
                 getProgress_percent() /*3*/, getProgress_seconds_elapsed() /*6*/);
 
-        sendToDisplay(PSTR(output));
+        sendToDisplay(output);
     }
 
-    void TouchDisplay::sendL9FirmwareInfo()
+    void TouchDisplay::send_L9_FirmwareInfo()
     {
         sprintf(output, "L9 DN:Geeetech;DM:A30T;SN:TheThomasD;FV:%s;PV:320.00 x 320.00 x 420.00;HV:GTM32_103_V1;", getFirmwareName_str());
 
-        sendToDisplay(PSTR(output));
+        sendToDisplay(output);
     }
 
-    void TouchDisplay::sendL11ZOffset() {
+    void TouchDisplay::send_L10_ZOffset()
+    {
         char zOffset[7];
 
-        dtostrf(getZOffset_mm(), 0, 2, zOffset);
+        dtostrf(home_offset[Z_AXIS], 0, 2, zOffset);
 
-        sprintf(output, "L11 P0 S%s", zOffset);
-    
-        sendToDisplay(PSTR(output));
+        sprintf(output, "L10 S%s", zOffset);
+
+        sendToDisplay(output);
+    }
+
+    void TouchDisplay::send_L11_ProbeZOffset()
+    {
+        char probeZOffset[7];
+
+        dtostrf(getZOffset_mm(), 0, 2, probeZOffset);
+
+        sprintf(output, "L11 P0 S%s", probeZOffset);
+
+        sendToDisplay(output);
     }
 
     void TouchDisplay::sendToDisplay(PGM_P message, const bool addChecksum)

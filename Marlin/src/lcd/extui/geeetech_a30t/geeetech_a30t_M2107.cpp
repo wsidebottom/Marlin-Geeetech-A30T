@@ -93,7 +93,7 @@ namespace Geeetech
     {
         simulatedAutoLevelSwitchOn = true;
         handleGcode("M500\nG91\nG0 Z10\nG90\nG0 X0 Y0 F1000"); // store settings and return home
-        sendToDisplay("M2107 save success")
+        sendToDisplay("M2107 save success");
     };
 
     void TouchDisplay::moveToXYWithZHop(const char *xPos, const char *yPos)

@@ -57,6 +57,7 @@
 
 // commands that need immediate answer
 #define FOREACH_ANSWER(PARAMETER, COMMAND) \
+    COMMAND(PARAMETER, L101)               \
     COMMAND(PARAMETER, M2120)
 
 // manual leveling

@@ -87,12 +87,12 @@ namespace Geeetech
         simulatedAutoLevelSwitchOn = false;
         if (!isMachineHomed())
             handleGcode("G28");
+        send_L3_PrintInfo(); // transmit auto level off
     };
 
     void TouchDisplay::handle_M2107_S8_OkSave()
     {
-        simulatedAutoLevelSwitchOn = true;
-        handleGcode("M500\nG91\nG0 Z10\nG90\nG0 X0 Y0 F1000"); // store settings and return home
+        handleGcode("M500"); // store settings
         sendToDisplay("M2107 save success");
     };
 
@@ -101,6 +101,7 @@ namespace Geeetech
         String gcode = "G0 Z" + MANUAL_LEVELING_MOVE_Z_HOP + "\nG0 X%s Y%s\nG0 Z-" + MANUAL_LEVELING_MOVE_Z_HOP;
         sprintf(output, gcode.c_str(), xPos, yPos);
         handleGcode(output);
+        send_L3_PrintInfo(); // transmit auto level off
         sendToDisplay("M2107 ok");
     }
 

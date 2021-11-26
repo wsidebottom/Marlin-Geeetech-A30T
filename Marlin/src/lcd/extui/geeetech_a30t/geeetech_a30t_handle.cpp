@@ -62,7 +62,7 @@ namespace Geeetech
         {
         case L101: // return from M2107 manual leveling
             simulatedAutoLevelSwitchOn = true;
-            disableStatusSend = false;
+            disableAxisStatusSend = false;
             break;
         case M2107:
             handle_M2107_ManualLeveling(command);

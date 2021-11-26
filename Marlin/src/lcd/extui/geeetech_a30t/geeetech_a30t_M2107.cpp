@@ -51,19 +51,19 @@ namespace Geeetech
                 handle_M2107_S0_Start();
                 break;
             case '1': // move to pos 1 (RR)
-                moveToXYWithZHop(levelRR_xPosString, levelRR_yPosString);
+                moveToXYWithZHop(MANUAL_LEVELING_POS_RR_X, MANUAL_LEVELING_POS_RR_Y);
                 break;
             case '2': // move to pos 2 (RL)
-                moveToXYWithZHop(levelRL_xPosString, levelRL_yPosString);
+                moveToXYWithZHop(MANUAL_LEVELING_POS_RL_X, MANUAL_LEVELING_POS_RL_Y);
                 break;
             case '3': // move to pos 3 (FL)
-                moveToXYWithZHop(levelFL_xPosString, levelFL_yPosString);
+                moveToXYWithZHop(MANUAL_LEVELING_POS_FL_X, MANUAL_LEVELING_POS_FL_Y);
                 break;
             case '4': // move to pos 4 (FR)
-                moveToXYWithZHop(levelFR_xPosString, levelFR_yPosString);
+                moveToXYWithZHop(MANUAL_LEVELING_POS_FR_X, MANUAL_LEVELING_POS_FR_Y);
                 break;
             case '5': // move to pos 5 (C)
-                moveToXYWithZHop(levelCenter_xPosString, levelCenter_yPosString);
+                moveToXYWithZHop(X_CENTER, Y_CENTER);
                 break;
             case '6': // move Z up 0.5mm
                 moveUpDownSmallBigStep(MANUAL_LEVELING_MOVE_DIRECTION_UP, MANUAL_LEVELING_MOVE_BIG_STEP);
@@ -83,7 +83,7 @@ namespace Geeetech
 
     void TouchDisplay::handle_M2107_S0_Start()
     {
-        disableStatusSend = true;
+        disableAxisStatusSend = true;
         send_L10_ZOffset();
         if (!isMachineHomed())
             handleGcode("G28");
@@ -95,11 +95,11 @@ namespace Geeetech
         sendToDisplay("M2107 save success");
     };
 
-    void TouchDisplay::moveToXYWithZHop(const char *xPos, const char *yPos)
+    void TouchDisplay::moveToXYWithZHop(const float &xPos, const float &yPos)
     {
-        String gcode = "G0 Z" + MANUAL_LEVELING_MOVE_Z_HOP + " F500\nG0 X%s Y%s F8000\nG0 Z0 F500";
-        sprintf(output, gcode.c_str(), xPos, yPos);
-        handleGcode(output);
+        do_blocking_move_to_z(MANUAL_LEVELING_MOVE_Z_HOP, 500);
+        do_blocking_move_to_xy(xPos, yPos, 8000);
+        do_blocking_move_to_z(0, 500);
         sendToDisplay("M2107 ok");
     }
 

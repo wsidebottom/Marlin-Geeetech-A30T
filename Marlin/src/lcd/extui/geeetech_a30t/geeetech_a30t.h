@@ -56,6 +56,7 @@
 #include "../../../module/motion.h"
 #include "../../../libs/duration_t.h"
 #include "../../../module/printcounter.h"
+#include "../../../module/probe.h"
 #include "../../../gcode/queue.h"
 
 namespace Geeetech
@@ -92,18 +93,10 @@ namespace Geeetech
 
     private:
         static bool shouldWaitForCommand;
-        static char levelCenter_xPosString[7];
-        static char levelCenter_yPosString[7];
-
-        //status variables
-        static millis_t nextTempDataUpdate;
-        static char bedCurrentTemp[6], bedTargetTemp[6], e0CurrentTemp[6], e0TargetTemp[6];
-        //status methods
-        static void updateTemperatureDataIfNeeded(const millis_t &currentTimeMs);
 
         // send variables
         static millis_t nextStatusSend;
-        static bool disableStatusSend;
+        static bool disableAxisStatusSend;
         static char output[200]; // should be enough for all message
         // send methods
         static void setNextSendMs(const millis_t &currentTimeMs);
@@ -130,22 +123,14 @@ namespace Geeetech
         static void handleUnkownCommand(const UiCommand &command);
         static void handleProprietaryCommand(const UiCommand &command);
 
-        // M2107
-        static char levelRR_xPosString[7];
-        static char levelRR_yPosString[7];
-        static char levelRL_xPosString[7];
-        static char levelRL_yPosString[7];
-        static char levelFL_xPosString[7];
-        static char levelFL_yPosString[7];
-        static char levelFR_xPosString[7];
-        static char levelFR_yPosString[7];
+        // M2107 manual leveling
         static void handle_M2107_ManualLeveling(const UiCommand &command);
         static void handle_M2107_S0_Start();
         static void handle_M2107_S8_OkSave();
-        static void moveToXYWithZHop(const char *xPos, const char *yPos);
+        static void moveToXYWithZHop(const float &xPos, const float &yPos);
         static void moveUpDownSmallBigStep(const bool &up, const bool &bigStep);
 
-        // M2120
+        // M2120 automatic leveling
         static bool simulatedAutoLevelSwitchOn;
         static void handle_M2120_AutoLeveling(const UiCommand &command);
         static void handle_M2120_P1_ProbeControl(const char &sParameter);
@@ -156,7 +141,7 @@ namespace Geeetech
         static void handle_M2120_P6_CenterNozzle();
         static String mapSParameterToHeightString(const char &sParameter);
 
-        // M2134
+        // M2134 request firmware
         static void handle_M2134(const UiCommand &command);
     };
 

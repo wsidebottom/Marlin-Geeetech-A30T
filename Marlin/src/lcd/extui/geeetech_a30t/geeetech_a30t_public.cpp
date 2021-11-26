@@ -41,40 +41,9 @@ namespace Geeetech
 {
     bool TouchDisplay::shouldWaitForCommand = false;
     bool TouchDisplay::simulatedAutoLevelSwitchOn = true;
-    char TouchDisplay::levelCenter_xPosString[] = {};
-    char TouchDisplay::levelCenter_yPosString[] = {};
-    char TouchDisplay::levelRR_xPosString[] = {};
-    char TouchDisplay::levelRR_yPosString[] = {};
-    char TouchDisplay::levelRL_xPosString[] = {};
-    char TouchDisplay::levelRL_yPosString[] = {};
-    char TouchDisplay::levelFL_xPosString[] = {};
-    char TouchDisplay::levelFL_yPosString[] = {};
-    char TouchDisplay::levelFR_xPosString[] = {};
-    char TouchDisplay::levelFR_yPosString[] = {};
 
     void TouchDisplay::startup()
     {
-        // set position variables
-        // bed center (also manual leveling pos 5)
-        dtostrf(X_CENTER, 0, 2, levelCenter_xPosString);
-        dtostrf(Y_CENTER, 0, 2, levelCenter_yPosString);
-
-        // manual leveling pos 1 (RR)
-        dtostrf(X_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRR_xPosString);
-        dtostrf(Y_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRR_yPosString);
-
-        // manual leveling pos 2 (RL)
-        dtostrf(X_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRL_xPosString);
-        dtostrf(Y_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRL_yPosString);
-
-        // manual leveling pos 3 (FL)
-        dtostrf(X_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFL_xPosString);
-        dtostrf(Y_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFL_yPosString);
-
-        // manual leveling pos 4 (FR)
-        dtostrf(X_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFR_xPosString);
-        dtostrf(Y_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFR_yPosString);
-
         // use pin PD12 (60) as output and pull it up to supply 5V power
         SET_OUTPUT(60);
         WRITE(60, 1);
@@ -94,7 +63,6 @@ namespace Geeetech
     void TouchDisplay::process()
     {
         const millis_t currentTimeMs = millis();
-        updateTemperatureDataIfNeeded(currentTimeMs);
         sendStatusIfNeeded(currentTimeMs);
 
         if (LCD_SERIAL.available() && !shouldWaitForCommand)

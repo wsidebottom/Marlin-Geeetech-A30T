@@ -60,7 +60,7 @@ namespace Geeetech
         case '4': // offset down
             handle_M2120_P4_MoveDown(command.parameters[S].charAt(0));
             break;
-        case '5': // request Z offset value
+        case '5': // start and request Z offset value
             send_L11_ProbeZOffset();
             break;
         case '6': // move nozzle to center
@@ -93,12 +93,12 @@ namespace Geeetech
             handleGcode("M280 P0 S160"); // control servo
             break;
         }
+        send_L11_ProbeZOffset();
     }
 
     void TouchDisplay::handle_M2120_P2_StoreZOffset(const String &sParameter)
     {
-        setZOffset_mm(strtof(sParameter.c_str(), nullptr));
-        send_L11_ProbeZOffset();
+        setZOffset_mm(-strtof(sParameter.c_str(), nullptr));
     }
 
     void TouchDisplay::handle_M2120_P3_MoveUp(const char &sParameter)
@@ -113,24 +113,15 @@ namespace Geeetech
 
     void TouchDisplay::handle_M2120_P6_CenterNozzle()
     {
-        String gcode = "G0 X%s Y%s";
-        if (!isMachineHomed())
-            gcode = "G28\n" + gcode;
-
-        sprintf(output, gcode.c_str(), levelCenter_xPosString, levelCenter_yPosString);
-
-        handleGcode(output);
+        do_blocking_move_to_xy(X_CENTER, Y_CENTER);
     }
 
     void TouchDisplay::handle_M2120_P7_ProbeCenter()
     {
-        String gcode = "G30 X%s Y%s";
-        if (!isMachineHomed())
-            gcode = "G28\n" + gcode;
-
-        sprintf(output, gcode.c_str(), levelCenter_xPosString, levelCenter_yPosString);
-
-        handleGcode(output);
+        home_if_needed(false);
+        setZOffset_mm(0);
+        do_blocking_move_to_z(5);
+        probe.probe_at_point(X_CENTER, Y_CENTER);
     }
 
     String TouchDisplay::mapSParameterToHeightString(const char &sParameter)

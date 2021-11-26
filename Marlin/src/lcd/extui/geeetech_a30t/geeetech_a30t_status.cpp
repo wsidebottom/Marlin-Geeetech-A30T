@@ -40,25 +40,6 @@ using namespace ExtUI;
 
 namespace Geeetech
 {
-    millis_t TouchDisplay::nextTempDataUpdate = 0;
-    char TouchDisplay::bedCurrentTemp[] = {};
-    char TouchDisplay::bedTargetTemp[] = {};
-    char TouchDisplay::e0CurrentTemp[] = {};
-    char TouchDisplay::e0TargetTemp[] = {};
-
-    void TouchDisplay::updateTemperatureDataIfNeeded(const millis_t &currentTimeMs)
-    {
-        if (ELAPSED(currentTimeMs, nextTempDataUpdate))
-        {
-            dtostrf(getActualTemp_celsius(BED), 0, 1, bedCurrentTemp);
-            dtostrf(getTargetTemp_celsius(BED), 0, 1, bedTargetTemp);
-            dtostrf(getActualTemp_celsius(E0), 0, 1, e0CurrentTemp);
-            dtostrf(getTargetTemp_celsius(E0), 0, 1, e0TargetTemp);
-
-            nextTempDataUpdate = currentTimeMs + TEMP_STATUS_CYCLE_IN_MS;
-        }
-    }
-
     uint32_t TouchDisplay::getMixerRatio()
     {
         uint32_t result = mixer.mix[2];

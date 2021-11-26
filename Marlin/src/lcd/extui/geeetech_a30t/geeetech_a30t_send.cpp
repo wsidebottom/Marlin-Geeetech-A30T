@@ -41,16 +41,17 @@ using namespace ExtUI;
 namespace Geeetech
 {
     millis_t TouchDisplay::nextStatusSend = 0;
-    bool TouchDisplay::disableStatusSend = false;
+    bool TouchDisplay::disableAxisStatusSend = false;
     char TouchDisplay::output[] = {};
 
     void TouchDisplay::setNextSendMs(const millis_t &currentTimeMs) { nextStatusSend = currentTimeMs; }
 
     void TouchDisplay::sendStatusIfNeeded(const millis_t &currentTimeMs)
     {
-        if (!disableStatusSend && ELAPSED(currentTimeMs, nextStatusSend))
+        if (ELAPSED(currentTimeMs, nextStatusSend))
         {
-            send_L1_AxisInfo();
+            if (!disableAxisStatusSend)
+                send_L1_AxisInfo();
             send_L2_TempInfo();
             send_L3_PrintInfo();
             nextStatusSend = currentTimeMs + SEND_CYCLE_IN_MS;
@@ -73,6 +74,13 @@ namespace Geeetech
 
     void TouchDisplay::send_L2_TempInfo()
     {
+        char bedCurrentTemp[6], bedTargetTemp[6], e0CurrentTemp[6], e0TargetTemp[6];
+
+        dtostrf(getActualTemp_celsius(BED), 0, 1, bedCurrentTemp);
+        dtostrf(getTargetTemp_celsius(BED), 0, 1, bedTargetTemp);
+        dtostrf(getActualTemp_celsius(E0), 0, 1, e0CurrentTemp);
+        dtostrf(getTargetTemp_celsius(E0), 0, 1, e0TargetTemp);
+
         sprintf(output, "L2 B:%s /%s /%d T0:%s /%s /%d T1:%s /%s /%d T2:%s /%s /%d SD:%d F0:%d F2:50 R:%d FR:%d",
                 bedCurrentTemp /*5*/, bedTargetTemp /*5*/, BED_ACTIVE /*1*/,
                 e0CurrentTemp /*5*/, e0TargetTemp /*5*/, E0_ACTIVE /*1*/,
@@ -111,9 +119,7 @@ namespace Geeetech
     void TouchDisplay::send_L11_ProbeZOffset()
     {
         char probeZOffset[7];
-
         dtostrf(getZOffset_mm(), 0, 2, probeZOffset);
-
         sprintf(output, "L11 P0 S%s", probeZOffset);
 
         sendToDisplay(output);

@@ -41,13 +41,14 @@ using namespace ExtUI;
 namespace Geeetech
 {
     millis_t TouchDisplay::nextStatusSend = 0;
+    bool TouchDisplay::disableStatusSend = false;
     char TouchDisplay::output[] = {};
 
     void TouchDisplay::setNextSendMs(const millis_t &currentTimeMs) { nextStatusSend = currentTimeMs; }
 
     void TouchDisplay::sendStatusIfNeeded(const millis_t &currentTimeMs)
     {
-        if (ELAPSED(currentTimeMs, nextStatusSend))
+        if (!disableStatusSend && ELAPSED(currentTimeMs, nextStatusSend))
         {
             send_L1_AxisInfo();
             send_L2_TempInfo();
@@ -60,9 +61,10 @@ namespace Geeetech
     {
         char x[8], y[8], z[8]; // 6 digits + dot + \0
 
-        dtostrf(getAxisPosition_mm(X), 0, 3, x);
-        dtostrf(getAxisPosition_mm(Y), 0, 3, y);
-        dtostrf(getAxisPosition_mm(Z), 0, 3, z);
+        xyze_pos_t currentLogicalPos = current_position.asLogical();
+        dtostrf(currentLogicalPos.x, 0, 3, x);
+        dtostrf(currentLogicalPos.y, 0, 3, y);
+        dtostrf(currentLogicalPos.z, 0, 3, z);
 
         sprintf(output, "L1 X%s Y%s Z%s F%d",
                 x /*7*/, y /*7*/, z /*7*/, FEEDRATE /*3*/);
@@ -101,11 +103,8 @@ namespace Geeetech
     void TouchDisplay::send_L10_ZOffset()
     {
         char zOffset[7];
-
-        dtostrf(home_offset[Z_AXIS], 0, 2, zOffset);
-
+        dtostrf(-home_offset[Z_AXIS], 0, 2, zOffset);
         sprintf(output, "L10 S%s", zOffset);
-
         sendToDisplay(output);
     }
 

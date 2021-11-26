@@ -78,16 +78,15 @@ namespace Geeetech
                 moveUpDownSmallBigStep(MANUAL_LEVELING_MOVE_DIRECTION_DOWN, MANUAL_LEVELING_MOVE_SMALL_STEP);
                 break;
             }
-
         send_L10_ZOffset();
     }
 
     void TouchDisplay::handle_M2107_S0_Start()
     {
-        simulatedAutoLevelSwitchOn = false;
+        disableStatusSend = true;
+        send_L10_ZOffset();
         if (!isMachineHomed())
             handleGcode("G28");
-        send_L3_PrintInfo(); // transmit auto level off
     };
 
     void TouchDisplay::handle_M2107_S8_OkSave()
@@ -98,10 +97,9 @@ namespace Geeetech
 
     void TouchDisplay::moveToXYWithZHop(const char *xPos, const char *yPos)
     {
-        String gcode = "G0 Z" + MANUAL_LEVELING_MOVE_Z_HOP + "\nG0 X%s Y%s\nG0 Z-" + MANUAL_LEVELING_MOVE_Z_HOP;
+        String gcode = "G0 Z" + MANUAL_LEVELING_MOVE_Z_HOP + " F500\nG0 X%s Y%s F8000\nG0 Z0 F500";
         sprintf(output, gcode.c_str(), xPos, yPos);
         handleGcode(output);
-        send_L3_PrintInfo(); // transmit auto level off
         sendToDisplay("M2107 ok");
     }
 
@@ -115,7 +113,6 @@ namespace Geeetech
             newOffset += bigSmallStep == MANUAL_LEVELING_MOVE_BIG_STEP ? 0.5 : 0.05;
 
         set_home_offset(Z_AXIS, newOffset);
-
         handleGcode("G0 Z0 F300");
     }
 } // namespace Geeetech

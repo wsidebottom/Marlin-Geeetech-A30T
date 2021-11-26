@@ -63,15 +63,15 @@ namespace Geeetech
         dtostrf(X_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRR_xPosString);
         dtostrf(Y_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRR_yPosString);
 
-        // manual leveling pos 1 (RL)
+        // manual leveling pos 2 (RL)
         dtostrf(X_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRL_xPosString);
         dtostrf(Y_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelRL_yPosString);
 
-        // manual leveling pos 1 (FL)
+        // manual leveling pos 3 (FL)
         dtostrf(X_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFL_xPosString);
-        dtostrf(Y_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFL_yPosString);
+        dtostrf(Y_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFL_yPosString);
 
-        // manual leveling pos 1 (FR)
+        // manual leveling pos 4 (FR)
         dtostrf(X_MAX_BED - MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFR_xPosString);
         dtostrf(Y_MIN_BED + MANUAL_LEVELING_POINT_MARGIN, 0, 2, levelFR_yPosString);
 

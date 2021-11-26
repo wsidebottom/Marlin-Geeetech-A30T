@@ -103,6 +103,7 @@ namespace Geeetech
 
         // send variables
         static millis_t nextStatusSend;
+        static bool disableStatusSend;
         static char output[200]; // should be enough for all message
         // send methods
         static void setNextSendMs(const millis_t &currentTimeMs);

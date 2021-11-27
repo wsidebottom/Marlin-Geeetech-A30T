@@ -57,6 +57,7 @@
 #include "../../../libs/duration_t.h"
 #include "../../../module/printcounter.h"
 #include "../../../module/probe.h"
+#include "../../../module/settings.h"
 #include "../../../gcode/queue.h"
 
 namespace Geeetech
@@ -93,6 +94,7 @@ namespace Geeetech
 
     private:
         static bool shouldWaitForCommand;
+        static CommandType activeCommand;
 
         // send variables
         static millis_t nextStatusSend;
@@ -106,7 +108,7 @@ namespace Geeetech
         static void send_L3_PrintInfo();
         static void send_L9_FirmwareInfo();
         static void send_L10_ZOffset();
-        static void send_L11_ProbeZOffset();
+        static void send_L11_ProbeZOffset_andFakeL1();
         static void sendToDisplay(PGM_P message, const bool addChecksum = true);
         static uint32_t getMixerRatio();
         static uint8_t getPrintStatus();
@@ -139,7 +141,7 @@ namespace Geeetech
         static void handle_M2120_P4_MoveDown(const char &sParameter);
         static void handle_M2120_P7_ProbeCenter();
         static void handle_M2120_P6_CenterNozzle();
-        static String mapSParameterToHeightString(const char &sParameter);
+        static float mapSParameterToHeight(const char &sParameter);
 
         // M2134 request firmware
         static void handle_M2134(const UiCommand &command);

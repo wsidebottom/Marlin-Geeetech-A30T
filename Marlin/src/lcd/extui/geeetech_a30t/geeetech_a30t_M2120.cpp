@@ -46,7 +46,6 @@ namespace Geeetech
         {
         case '0': // auto leveling on/off
             simulatedAutoLevelSwitchOn = '1' == command.parameters[S].charAt(0);
-            send_L11_ProbeZOffset();
             break;
         case '1': // control probe
             handle_M2120_P1_ProbeControl(command.parameters[S].charAt(0));
@@ -61,7 +60,7 @@ namespace Geeetech
             handle_M2120_P4_MoveDown(command.parameters[S].charAt(0));
             break;
         case '5': // start and request Z offset value
-            send_L11_ProbeZOffset();
+            disableAxisStatusSend = true;
             break;
         case '6': // move nozzle to center
             handle_M2120_P6_CenterNozzle();
@@ -76,6 +75,8 @@ namespace Geeetech
 #endif
             break;
         }
+
+        send_L11_ProbeZOffset_andFakeL1();
     }
 
     void TouchDisplay::handle_M2120_P1_ProbeControl(const char &sParameter)
@@ -83,60 +84,71 @@ namespace Geeetech
         // BLtouch control
         switch (sParameter)
         {
-        case '0':                // pin up
-            handleGcode("M402"); // stow probe
+        case '0':         // pin up
+            probe.stow(); // stow probe
             break;
-        case '1':                // pin down
-            handleGcode("M401"); // deploy probe
+        case '1':           // pin down
+            probe.deploy(); // deploy probe
             break;
         default:                         // alarm release (case '2')
             handleGcode("M280 P0 S160"); // control servo
             break;
         }
-        send_L11_ProbeZOffset();
+        send_L11_ProbeZOffset_andFakeL1();
     }
 
     void TouchDisplay::handle_M2120_P2_StoreZOffset(const String &sParameter)
     {
-        setZOffset_mm(-strtof(sParameter.c_str(), nullptr));
+        setProbeOffset_mm(strtof(sParameter.c_str(), nullptr), Z);
     }
 
     void TouchDisplay::handle_M2120_P3_MoveUp(const char &sParameter)
     {
-        handleGcode("G91\nG0 Z" + mapSParameterToHeightString(sParameter) + "\nG90");
+        float height = mapSParameterToHeight(sParameter);
+        setProbeOffset_mm(getProbeOffset_mm(Z) + height, Z);
+        do_blocking_move_to_z(current_position.z + height);
     }
 
     void TouchDisplay::handle_M2120_P4_MoveDown(const char &sParameter)
     {
-        handleGcode("G91\nG0 Z-" + mapSParameterToHeightString(sParameter) + "\nG90");
+        float height = mapSParameterToHeight(sParameter);
+        setProbeOffset_mm(getProbeOffset_mm(Z) - height, Z);
+        do_blocking_move_to_z(current_position.z - height);
     }
 
     void TouchDisplay::handle_M2120_P6_CenterNozzle()
     {
-        do_blocking_move_to_xy(X_CENTER, Y_CENTER);
+        // NO-OP, moving already done in "probe center"
     }
 
     void TouchDisplay::handle_M2120_P7_ProbeCenter()
     {
+        setProbeOffset_mm(0, Z);
         home_if_needed(false);
-        setZOffset_mm(0);
         do_blocking_move_to_z(5);
-        probe.probe_at_point(X_CENTER, Y_CENTER);
+        float probeZOffset = probe.probe_at_point(X_CENTER, Y_CENTER);
+        SERIAL_ECHOLN(probeZOffset);
+        float newProbeOffset = -probeZOffset + 5;
+        SERIAL_ECHOLN(newProbeOffset);
+        setProbeOffset_mm(newProbeOffset, Z);
+        do_blocking_move_to_xy(X_CENTER, Y_CENTER);
+        do_blocking_move_to_z(newProbeOffset);
+        do_blocking_move_to_z(5 - home_offset.z);
     }
 
-    String TouchDisplay::mapSParameterToHeightString(const char &sParameter)
+    float TouchDisplay::mapSParameterToHeight(const char &sParameter)
     {
         switch (sParameter)
         {
         case '0':
-            return "10";
+            return 10;
         case '1':
-            return "1";
+            return 1;
         case '2':
-            return "0.1";
+            return 0.1;
         case '3':
         default:
-            return "0.05";
+            return 0.05;
         }
     }
 

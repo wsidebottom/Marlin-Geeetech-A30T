@@ -85,13 +85,12 @@ namespace Geeetech
     {
         disableAxisStatusSend = true;
         send_L10_ZOffset();
-        if (!isMachineHomed())
-            handleGcode("G28");
+        home_if_needed(false);
     };
 
     void TouchDisplay::handle_M2107_S8_OkSave()
     {
-        handleGcode("M500"); // store settings
+        settings.save();
         sendToDisplay("M2107 save success");
     };
 
@@ -113,7 +112,7 @@ namespace Geeetech
             newOffset += bigSmallStep == MANUAL_LEVELING_MOVE_BIG_STEP ? 0.5 : 0.05;
 
         set_home_offset(Z_AXIS, newOffset);
-        handleGcode("G0 Z0 F300");
+        do_blocking_move_to_z(0, 300);
     }
 } // namespace Geeetech
 

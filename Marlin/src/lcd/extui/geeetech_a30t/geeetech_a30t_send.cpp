@@ -116,13 +116,14 @@ namespace Geeetech
         sendToDisplay(output);
     }
 
-    void TouchDisplay::send_L11_ProbeZOffset()
+    void TouchDisplay::send_L11_ProbeZOffset_andFakeL1()
     {
+        // send L11 and fake L1 as it is required as well :(
         char probeZOffset[7];
-        dtostrf(getZOffset_mm(), 0, 2, probeZOffset);
-        sprintf(output, "L11 P0 S%s", probeZOffset);
-
-        sendToDisplay(output);
+        dtostrf(getProbeOffset_mm(Z), 0, 2, probeZOffset);
+        sprintf(output, "%s", probeZOffset);
+        sendToDisplay(("L1 Z" + (String)output).c_str());
+        sendToDisplay(("L11 P0 S" + (String)output).c_str());
     }
 
     void TouchDisplay::sendToDisplay(PGM_P message, const bool addChecksum)

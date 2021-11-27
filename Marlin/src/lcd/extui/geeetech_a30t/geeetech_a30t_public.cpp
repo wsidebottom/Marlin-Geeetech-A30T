@@ -41,6 +41,7 @@ namespace Geeetech
 {
     bool TouchDisplay::shouldWaitForCommand = false;
     bool TouchDisplay::simulatedAutoLevelSwitchOn = true;
+    CommandType TouchDisplay::activeCommand = Unknown;
 
     void TouchDisplay::startup()
     {
@@ -63,11 +64,18 @@ namespace Geeetech
     void TouchDisplay::process()
     {
         const millis_t currentTimeMs = millis();
-        sendStatusIfNeeded(currentTimeMs);
-
         if (LCD_SERIAL.available() && !shouldWaitForCommand)
         {
             UiCommand command = receiveCommand();
+
+            // ignore unkown command types for keeping command group active
+            if (Unknown != command.type)
+            {
+                // current command group is not active anymore, so enable updates again
+                if (disableAxisStatusSend && activeCommand != command.type)
+                    disableAxisStatusSend = false;
+                activeCommand = command.type;
+            }
 
 #ifdef GEEETECH_DISPLAY_DEBUG
             SERIAL_ECHOLNPGM("CommandType: ", COMMAND_STRINGS[command.type]);
@@ -87,6 +95,8 @@ namespace Geeetech
             if (false FOREACH_ANSWER(command.type, GENERATE_BOOL_COMPARE))
                 setNextSendMs(currentTimeMs);
         }
+
+        sendStatusIfNeeded(currentTimeMs);
     }
 
 } // namespace Geeetech

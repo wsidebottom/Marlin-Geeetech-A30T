@@ -159,25 +159,25 @@ namespace Geeetech
         sendToDisplay(output);
 
         // velocity (mm/s): A=X-VMax B=Y-VMax C=Z-VMax D=E-VMax E=VMin F=VTravel
-        const String p1 = start + "1 A%s B%s C%s D%s E%s F%s";
-        dtostrf(planner.settings.max_feedrate_mm_s[X_AXIS], 0, 2, varA);
-        dtostrf(planner.settings.max_feedrate_mm_s[Y_AXIS], 0, 2, varB);
-        dtostrf(planner.settings.max_feedrate_mm_s[Z_AXIS], 0, 2, varC);
-        dtostrf(planner.settings.max_feedrate_mm_s[E_AXIS], 0, 2, varD);
-        dtostrf(planner.settings.min_feedrate_mm_s, 0, 2, varE);
-        dtostrf(planner.settings.min_travel_feedrate_mm_s, 0, 2, varF);
-        sprintf(output, p1.c_str(), varA, varB, varC, varD, varE, varF);
+        const String p1 = start + "1 A%d B%d C%d D%d E%d F%d";
+        sprintf(output, p1.c_str(),
+                /*A*/ (int)planner.settings.max_feedrate_mm_s[X_AXIS],
+                /*B*/ (int)planner.settings.max_feedrate_mm_s[Y_AXIS],
+                /*C*/ (int)planner.settings.max_feedrate_mm_s[Z_AXIS],
+                /*D*/ (int)planner.settings.max_feedrate_mm_s[E_AXIS],
+                /*E*/ MAX((int)planner.settings.min_feedrate_mm_s, 1),
+                /*F*/ MAX((int)planner.settings.min_travel_feedrate_mm_s, 1));
         sendToDisplay(output);
 
         // acceleration (steps/s2): A=Accel, B=A-Retract, C=X-Max accel, D=Y-Max accel, E=Z-Max accel, F=E-Max accel
-        const String p2 = start + "2 A%s B%s C%s D%s E%s F%s";
-        dtostrf(planner.settings.acceleration, 0, 2, varA);
-        dtostrf(fwretract.settings.retract_feedrate_mm_s, 0, 2, varB);
-        dtostrf(planner.settings.max_acceleration_mm_per_s2[X_AXIS], 0, 2, varC);
-        dtostrf(planner.settings.max_acceleration_mm_per_s2[Y_AXIS], 0, 2, varD);
-        dtostrf(planner.settings.max_acceleration_mm_per_s2[Z_AXIS], 0, 2, varE);
-        dtostrf(planner.settings.max_acceleration_mm_per_s2[E_AXIS], 0, 2, varF);
-        sprintf(output, p2.c_str(), varA, varB, varC, varD, varE, varF);
+        const String p2 = start + "2 A%d B%d C%d D%d E%d F%d";
+        sprintf(output, p2.c_str(),
+                /*A*/ (int)planner.settings.acceleration,
+                /*B*/ (int)fwretract.settings.retract_feedrate_mm_s,
+                /*C*/ (int)planner.settings.max_acceleration_mm_per_s2[X_AXIS],
+                /*D*/ (int)planner.settings.max_acceleration_mm_per_s2[Y_AXIS],
+                /*E*/ (int)planner.settings.max_acceleration_mm_per_s2[Z_AXIS],
+                /*F*/ (int)planner.settings.max_acceleration_mm_per_s2[E_AXIS]);
         sendToDisplay(output);
 
         //jerk (mm/s): A=Vx-jerk, B=Vy-jerk, C=Vz-jerk, D=Ve-jerk

@@ -123,7 +123,7 @@ namespace Geeetech
     {
         // send L11 and fake L1 as it is required as well :(
         char probeZOffset[7];
-        dtostrf(getProbeOffset_mm(Z), 0, 2, probeZOffset);
+        dtostrf(getProbeOffset_mm(ExtUI::Z), 0, 2, probeZOffset);
         sprintf(output, "%s", probeZOffset);
         sendToDisplay(("L1 Z" + (String)output).c_str());
         sendToDisplay(("L11 P0 S" + (String)output).c_str());
@@ -191,7 +191,7 @@ namespace Geeetech
 
         // babystep (mm): A=Z
         const String p5 = start + "5 A%s";
-        dtostrf(probe.offset.z, 0, 2, varA);
+        dtostrf(temporaryBabystepValue, 0, 2, varA);
         sprintf(output, p5.c_str(), varA);
         sendToDisplay(output);
 

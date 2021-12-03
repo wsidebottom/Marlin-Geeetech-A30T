@@ -64,6 +64,9 @@ namespace Geeetech
             simulatedAutoLevelSwitchOn = true;
             disableAxisStatusSend = false;
             break;
+        case M290:
+            handle_M290_Babystep(command);
+            break;
         case M2105:
             handle_M2105_ExtruderCommands(command);
             break;

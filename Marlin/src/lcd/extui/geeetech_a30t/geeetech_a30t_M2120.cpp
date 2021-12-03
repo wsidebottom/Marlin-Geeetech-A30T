@@ -99,21 +99,21 @@ namespace Geeetech
 
     void TouchDisplay::handle_M2120_P2_StoreZOffset(const String &sParameter)
     {
-        setProbeOffset_mm(strtof(sParameter.c_str(), nullptr), Z);
+        setProbeOffset_mm(strtof(sParameter.c_str(), nullptr), ExtUI::Z);
         settings.save();
     }
 
     void TouchDisplay::handle_M2120_P3_MoveUp(const char &sParameter)
     {
         float_t height = mapSParameterToHeight(sParameter);
-        setProbeOffset_mm(getProbeOffset_mm(Z) + height, Z);
+        setProbeOffset_mm(getProbeOffset_mm(ExtUI::Z) + height, ExtUI::Z);
         do_blocking_move_to_z(current_position.z + height);
     }
 
     void TouchDisplay::handle_M2120_P4_MoveDown(const char &sParameter)
     {
         float_t height = mapSParameterToHeight(sParameter);
-        setProbeOffset_mm(getProbeOffset_mm(Z) - height, Z);
+        setProbeOffset_mm(getProbeOffset_mm(ExtUI::Z) - height, ExtUI::Z);
         do_blocking_move_to_z(current_position.z - height);
     }
 
@@ -124,14 +124,12 @@ namespace Geeetech
 
     void TouchDisplay::handle_M2120_P7_ProbeCenter()
     {
-        setProbeOffset_mm(0, Z);
+        setProbeOffset_mm(0, ExtUI::Z);
         home_if_needed(false);
         do_blocking_move_to_z(5);
         float_t probeZOffset = probe.probe_at_point(X_CENTER, Y_CENTER);
-        SERIAL_ECHOLN(probeZOffset);
         float_t newProbeOffset = -probeZOffset + 5;
-        SERIAL_ECHOLN(newProbeOffset);
-        setProbeOffset_mm(newProbeOffset, Z);
+        setProbeOffset_mm(newProbeOffset, ExtUI::Z);
         do_blocking_move_to_xy(X_CENTER, Y_CENTER);
         do_blocking_move_to_z(5 - home_offset.z);
     }
@@ -141,7 +139,7 @@ namespace Geeetech
         switch (sParameter)
         {
         case '0':
-            return 10;
+            return 1; // this is defined as 10, but that would be waaaaaay to much!
         case '1':
             return 1;
         case '2':

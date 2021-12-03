@@ -87,7 +87,6 @@ namespace Geeetech
             if (CLEAN == extrudeMode && ELAPSED(currentTimeMs, nextExtruderSwitch))
             {
                 nextExtruderSwitch = currentTimeMs + SWITCH_EXTRUDER_CYCLE_IN_MS;
-                SERIAL_ECHOLN("SWITCH");
                 mixer.set_collector(0, E0 == currentCleaningExtruder ? 1.0 : 0.0);
                 mixer.set_collector(1, E1 == currentCleaningExtruder ? 1.0 : 0.0);
                 mixer.set_collector(2, E2 == currentCleaningExtruder ? 1.0 : 0.0);

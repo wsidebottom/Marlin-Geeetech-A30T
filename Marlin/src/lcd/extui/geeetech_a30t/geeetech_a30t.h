@@ -153,6 +153,10 @@ namespace Geeetech
         static void handleUnkownCommand(const UiCommand &command);
         static void handleProprietaryCommand(const UiCommand &command);
 
+        // M290 babystep
+        static float_t temporaryBabystepValue; // needed because only values up to 2.00 are accepted
+        static void handle_M290_Babystep(const UiCommand &command);
+
         // M2015 extruder control
         static millis_t nextExtrude;
         static millis_t nextExtruderSwitch;

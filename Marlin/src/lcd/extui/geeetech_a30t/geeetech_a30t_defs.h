@@ -42,6 +42,7 @@
     COMMAND(Unknown)             \
     COMMAND(GCode)               \
     COMMAND(L101)                \
+    COMMAND(M290)                \
     COMMAND(M2105)               \
     COMMAND(M2107)               \
     COMMAND(M2120)               \
@@ -57,6 +58,7 @@
     PARAM(C)                     \
     PARAM(D)                     \
     PARAM(R)                     \
+    PARAM(Z)                     \
     PARAM(FW)
 
 // modes of extruder moves
@@ -68,6 +70,7 @@
 // commands that need immediate answer
 #define FOREACH_ANSWER(PARAMETER, COMMAND) \
     COMMAND(PARAMETER, L101)               \
+    COMMAND(PARAMETER, M290)               \
     COMMAND(PARAMETER, M2120)
 
 // manual leveling

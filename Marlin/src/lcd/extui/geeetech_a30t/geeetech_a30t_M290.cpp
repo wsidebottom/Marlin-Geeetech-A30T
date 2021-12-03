@@ -23,7 +23,9 @@
 /**
  * lcd/extui/geeetech_a30t/geeetech_a30t_M2134.cpp
  *
- * This file implements the M2140 command for viewing/setting motion parameters
+ * This file implements the M290 command for applying babysteps as
+ * the behavior implemented in Marlin seems to be different. The
+ * display sends absolut values, the command seems to expect differences.
  *  
  * written in 2021 by TheThomasD
  */
@@ -40,10 +42,25 @@ using namespace ExtUI;
 
 namespace Geeetech
 {
-    void TouchDisplay::handle_M2140_MotionParams(const UiCommand &command)
+    float_t TouchDisplay::temporaryBabystepValue = 0.0;
+
+    void TouchDisplay::handle_M290_Babystep(const UiCommand &command)
     {
-        if (command.parameters[R].equals("0"))
+        if (((String) "0").equals(command.parameters[Z]))
+        {
             settings.load();
+            temporaryBabystepValue = 0.0;
+        }
+        else
+        {
+            const float zOffset = strtof(command.parameters[Z].c_str(), nullptr);
+            
+            if (zOffset > temporaryBabystepValue)
+                setZOffset_mm(getZOffset_mm() + 0.01);
+            else
+                setZOffset_mm(getZOffset_mm() - 0.01);
+            temporaryBabystepValue = zOffset;
+        }
     }
 } // namespace Geeetech
 

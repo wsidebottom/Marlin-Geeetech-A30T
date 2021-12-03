@@ -86,6 +86,7 @@ namespace Geeetech
         disableAxisStatusSend = true;
         send_L10_ZOffset();
         home_if_needed(false);
+        do_blocking_move_to_z(0.0 - home_offset.z, 200.0F);
     };
 
     void TouchDisplay::handle_M2107_S8_OkSave()
@@ -96,9 +97,9 @@ namespace Geeetech
 
     void TouchDisplay::moveToXYWithZHop(const float &xPos, const float &yPos)
     {
-        do_blocking_move_to_z(MANUAL_LEVELING_MOVE_Z_HOP, 500);
-        do_blocking_move_to_xy(xPos, yPos, 8000);
-        do_blocking_move_to_z(0, 500);
+        do_blocking_move_to_z(MANUAL_LEVELING_MOVE_Z_HOP);
+        do_blocking_move_to_xy(xPos, yPos);
+        do_blocking_move_to_z(0.0 - home_offset.z);
         sendToDisplay("M2107 ok");
     }
 
@@ -112,7 +113,7 @@ namespace Geeetech
             newOffset += bigSmallStep == MANUAL_LEVELING_MOVE_BIG_STEP ? 0.5 : 0.05;
 
         set_home_offset(Z_AXIS, newOffset);
-        do_blocking_move_to_z(0, 300);
+        do_blocking_move_to_z(0.0 - home_offset.z, 200.0);
     }
 } // namespace Geeetech
 

@@ -100,6 +100,7 @@ namespace Geeetech
     void TouchDisplay::handle_M2120_P2_StoreZOffset(const String &sParameter)
     {
         setProbeOffset_mm(strtof(sParameter.c_str(), nullptr), Z);
+        settings.save();
     }
 
     void TouchDisplay::handle_M2120_P3_MoveUp(const char &sParameter)
@@ -132,7 +133,6 @@ namespace Geeetech
         SERIAL_ECHOLN(newProbeOffset);
         setProbeOffset_mm(newProbeOffset, Z);
         do_blocking_move_to_xy(X_CENTER, Y_CENTER);
-        do_blocking_move_to_z(newProbeOffset);
         do_blocking_move_to_z(5 - home_offset.z);
     }
 

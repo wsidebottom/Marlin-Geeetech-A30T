@@ -47,7 +47,7 @@ namespace ExtUI
   void onPrintTimerStopped() {}
   void onPrintFinished() {}
 
-  void onStatusChanged(const char *const msg) {}
+  void onStatusChanged(const char *const msg) { Display.showMessage(msg); }
 
   void onMediaInserted() {}
   void onMediaError() {}

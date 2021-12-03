@@ -126,6 +126,10 @@ namespace Geeetech
         sendToDisplay(("L11 P0 S" + (String)output).c_str());
     }
 
+    void TouchDisplay::send_L14_MessageToDisplay(const String &message) {
+        sendToDisplay(("L14 " + message).c_str());
+    }
+
     void TouchDisplay::sendToDisplay(PGM_P message, const bool addChecksum)
     {
         if (addChecksum)

@@ -96,6 +96,7 @@ namespace Geeetech
         static void startup();
         static void process();
         static void waitForCommand(const bool ignore);
+        static void showMessage(const char *const message);
 
     private:
         static bool shouldWaitForCommand;
@@ -114,6 +115,7 @@ namespace Geeetech
         static void send_L9_FirmwareInfo();
         static void send_L10_ZOffset();
         static void send_L11_ProbeZOffset_andFakeL1();
+        static void send_L14_MessageToDisplay(const String &message);
         static void sendToDisplay(PGM_P message, const bool addChecksum = true);
         static uint32_t getMixerRatio();
         static uint8_t getPrintStatus();

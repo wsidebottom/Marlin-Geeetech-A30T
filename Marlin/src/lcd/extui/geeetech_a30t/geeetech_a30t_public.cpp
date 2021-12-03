@@ -100,6 +100,10 @@ namespace Geeetech
         sendStatusIfNeeded(currentTimeMs);
     }
 
+    void TouchDisplay::showMessage(const char *const message) {
+        send_L14_MessageToDisplay(message);
+    }
+
 } // namespace Geeetech
 
 #endif // GEEETECH_A30T_TFT

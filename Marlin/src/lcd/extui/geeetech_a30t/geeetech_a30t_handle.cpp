@@ -76,6 +76,9 @@ namespace Geeetech
         case M2134:
             handle_M2134_RequestFirmware(command);
             break;
+        case M2140:
+            handle_M2140_MotionParams(command);
+            break;
         default:
 #ifdef GEEETECH_DISPLAY_DEBUG
             SERIAL_ECHOLNPGM("Command not handled: ", COMMAND_STRINGS[command.type]);

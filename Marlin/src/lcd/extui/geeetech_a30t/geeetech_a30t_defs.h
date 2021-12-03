@@ -45,7 +45,8 @@
     COMMAND(M2105)               \
     COMMAND(M2107)               \
     COMMAND(M2120)               \
-    COMMAND(M2134)
+    COMMAND(M2134)               \
+    COMMAND(M2140)
 
 // parameter enum
 #define FOREACH_PARAMETER(PARAM) \
@@ -55,6 +56,7 @@
     PARAM(B)                     \
     PARAM(C)                     \
     PARAM(D)                     \
+    PARAM(R)                     \
     PARAM(FW)
 
 // modes of extruder moves

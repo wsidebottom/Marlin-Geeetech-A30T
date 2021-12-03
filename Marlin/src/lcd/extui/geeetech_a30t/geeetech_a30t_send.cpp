@@ -51,7 +51,10 @@ namespace Geeetech
         if (ELAPSED(currentTimeMs, nextStatusSend))
         {
             if (!disableAxisStatusSend)
+            {
                 send_L1_AxisInfo();
+                send_L24_SettingsStatus();
+            }
             send_L2_TempInfo();
             send_L3_PrintInfo();
             nextStatusSend = currentTimeMs + SEND_CYCLE_IN_MS;
@@ -126,12 +129,78 @@ namespace Geeetech
         sendToDisplay(("L11 P0 S" + (String)output).c_str());
     }
 
-    void TouchDisplay::send_L14_MessageToDisplay(const String &message) {
+    void TouchDisplay::send_L14_MessageToDisplay(const String &message)
+    {
         sendToDisplay(("L14 " + message).c_str());
     }
 
-    void TouchDisplay::send_L18_UserMessage(const UserMessageCode &code) {
+    void TouchDisplay::send_L18_UserMessage(const UserMessageCode &code)
+    {
         sendToDisplay(("L18 P26 S" + (String)code).c_str());
+    }
+
+    void TouchDisplay::send_L24_SettingsStatus()
+    {
+        const String start = "L24 P";
+        char varA[10];
+        char varB[10];
+        char varC[10];
+        char varD[10];
+        char varE[10];
+        char varF[10];
+
+        // steps/mm: A=X, B=Y, C=Z, D=E(one for all)
+        const String p0 = start + "0 A%s B%s C%s D%s";
+        dtostrf(planner.settings.axis_steps_per_mm[X_AXIS], 0, 2, varA);
+        dtostrf(planner.settings.axis_steps_per_mm[Y_AXIS], 0, 2, varB);
+        dtostrf(planner.settings.axis_steps_per_mm[Z_AXIS], 0, 2, varC);
+        dtostrf(planner.settings.axis_steps_per_mm[E_AXIS], 0, 2, varD);
+        sprintf(output, p0.c_str(), varA, varB, varC, varD);
+        sendToDisplay(output);
+
+        // velocity (mm/s): A=X-VMax B=Y-VMax C=Z-VMax D=E-VMax E=VMin F=VTravel
+        const String p1 = start + "1 A%s B%s C%s D%s E%s F%s";
+        dtostrf(planner.settings.max_feedrate_mm_s[X_AXIS], 0, 2, varA);
+        dtostrf(planner.settings.max_feedrate_mm_s[Y_AXIS], 0, 2, varB);
+        dtostrf(planner.settings.max_feedrate_mm_s[Z_AXIS], 0, 2, varC);
+        dtostrf(planner.settings.max_feedrate_mm_s[E_AXIS], 0, 2, varD);
+        dtostrf(planner.settings.min_feedrate_mm_s, 0, 2, varE);
+        dtostrf(planner.settings.min_travel_feedrate_mm_s, 0, 2, varF);
+        sprintf(output, p1.c_str(), varA, varB, varC, varD, varE, varF);
+        sendToDisplay(output);
+
+        // acceleration (steps/s2): A=Accel, B=A-Retract, C=X-Max accel, D=Y-Max accel, E=Z-Max accel, F=E-Max accel
+        const String p2 = start + "2 A%s B%s C%s D%s E%s F%s";
+        dtostrf(planner.settings.acceleration, 0, 2, varA);
+        dtostrf(fwretract.settings.retract_feedrate_mm_s, 0, 2, varB);
+        dtostrf(planner.settings.max_acceleration_mm_per_s2[X_AXIS], 0, 2, varC);
+        dtostrf(planner.settings.max_acceleration_mm_per_s2[Y_AXIS], 0, 2, varD);
+        dtostrf(planner.settings.max_acceleration_mm_per_s2[Z_AXIS], 0, 2, varE);
+        dtostrf(planner.settings.max_acceleration_mm_per_s2[E_AXIS], 0, 2, varF);
+        sprintf(output, p2.c_str(), varA, varB, varC, varD, varE, varF);
+        sendToDisplay(output);
+
+        //jerk (mm/s): A=Vx-jerk, B=Vy-jerk, C=Vz-jerk, D=Ve-jerk
+        const String p3 = start + "3 A%s B%s C%s D%s";
+        dtostrf(planner.max_jerk.x, 0, 2, varA);
+        dtostrf(planner.max_jerk.y, 0, 2, varB);
+        dtostrf(planner.max_jerk.z, 0, 2, varC);
+        dtostrf(planner.max_jerk.e, 0, 2, varD);
+        sprintf(output, p3.c_str(), varA, varB, varC, varD);
+        sendToDisplay(output);
+
+        // babystep (mm): A=Z
+        const String p5 = start + "5 A%s";
+        dtostrf(probe.offset.z, 0, 2, varA);
+        sprintf(output, p5.c_str(), varA);
+        sendToDisplay(output);
+
+        // double-z home offset
+        const String p6 = start + "6 A%s B%s";
+        dtostrf(endstops.z2_endstop_adj > 0 ? endstops.z2_endstop_adj : 0.0, 0, 2, varA);
+        dtostrf(endstops.z2_endstop_adj < 0 ? -endstops.z2_endstop_adj : 0.0, 0, 2, varB);
+        sprintf(output, p6.c_str(), varA, varB);
+        sendToDisplay(output);
     }
 
     void TouchDisplay::sendToDisplay(PGM_P message, const bool addChecksum)

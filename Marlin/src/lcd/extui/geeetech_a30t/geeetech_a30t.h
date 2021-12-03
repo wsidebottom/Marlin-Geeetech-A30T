@@ -57,6 +57,7 @@
 #include "../../../module/printcounter.h"
 #include "../../../module/probe.h"
 #include "../../../module/settings.h"
+#include "../../../module/endstops.h"
 #include "../../../libs/duration_t.h"
 #include "../../../gcode/queue.h"
 #include "../../../feature/mixing.h"
@@ -135,6 +136,7 @@ namespace Geeetech
         static void send_L11_ProbeZOffset_andFakeL1();
         static void send_L14_MessageToDisplay(const String &message);
         static void send_L18_UserMessage(const UserMessageCode &code);
+        static void send_L24_SettingsStatus();
         static void sendToDisplay(PGM_P message, const bool addChecksum = true);
         static uint32_t getMixerRatio();
         static uint8_t getPrintStatus();
@@ -182,6 +184,9 @@ namespace Geeetech
 
         // M2134 request firmware
         static void handle_M2134_RequestFirmware(const UiCommand &command);
+
+        // M2140 view/set motion parameters
+        static void handle_M2140_MotionParams(const UiCommand &command);
     };
 
     extern TouchDisplay Display;

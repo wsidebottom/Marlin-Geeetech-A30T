@@ -38,7 +38,7 @@ namespace ExtUI
   void onStartup() { Display.startup(); }
   void onIdle() { Display.process(); }
 
-  void onFilamentRunout(const extruder_t extruder) {}
+  void onFilamentRunout(const extruder_t extruder) { Display.showUserMessage(NoFilament); }
 
   void onPrinterKilled(FSTR_P const error, FSTR_P const component) {}
 
@@ -47,11 +47,11 @@ namespace ExtUI
   void onPrintTimerStopped() {}
   void onPrintFinished() {}
 
-  void onStatusChanged(const char *const msg) { Display.showMessage(msg); }
+  void onStatusChanged(const char *const msg) { Display.showStatus(msg); }
 
   void onMediaInserted() {}
   void onMediaError() {}
-  void onMediaRemoved() {}
+  void onMediaRemoved() { Display.showUserMessage(SdRemoved); }
 
   void onPlayTone(const uint16_t, const uint16_t) {}
 

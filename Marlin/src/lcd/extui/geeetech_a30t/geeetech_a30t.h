@@ -82,6 +82,23 @@ namespace Geeetech
         FOREACH_E_MODE(GENERATE_ENUM)
     };
 
+    enum UserMessageCode {
+        NoFilament = 0,
+        SdRemoved = 1,
+        AskResumePrint = 2,
+        FileNotFound = 3,
+        HotendTempAbnormal = 4,
+        BedTempAbnormal = 5,
+        TempAbnormalJobStopped = 6,
+        TempAbnormalUserShouldKillJob = 8,
+        CouldNotOpenFile = 10,
+        Alarm3Dtouch = 11,
+        HotendTooCold = 12,
+        OperationUnavailable = 13,
+        AskTerminateAutoPID = 14,
+        AskWaitForUser = 15
+    };
+
     struct UiCommand
     {
         CommandType type;
@@ -96,7 +113,8 @@ namespace Geeetech
         static void startup();
         static void process();
         static void waitForCommand(const bool ignore);
-        static void showMessage(const char *const message);
+        static void showStatus(const char *const message);
+        static void showUserMessage(const UserMessageCode &code);
 
     private:
         static bool shouldWaitForCommand;
@@ -116,6 +134,7 @@ namespace Geeetech
         static void send_L10_ZOffset();
         static void send_L11_ProbeZOffset_andFakeL1();
         static void send_L14_MessageToDisplay(const String &message);
+        static void send_L18_UserMessage(const UserMessageCode &code);
         static void sendToDisplay(PGM_P message, const bool addChecksum = true);
         static uint32_t getMixerRatio();
         static uint8_t getPrintStatus();

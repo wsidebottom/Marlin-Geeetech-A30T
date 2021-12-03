@@ -100,8 +100,12 @@ namespace Geeetech
         sendStatusIfNeeded(currentTimeMs);
     }
 
-    void TouchDisplay::showMessage(const char *const message) {
+    void TouchDisplay::showStatus(const char *const message) {
         send_L14_MessageToDisplay(message);
+    }
+
+    void TouchDisplay::showUserMessage(const UserMessageCode &code) {
+        send_L18_UserMessage(code);
     }
 
 } // namespace Geeetech

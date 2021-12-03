@@ -40,7 +40,7 @@ using namespace ExtUI;
 
 namespace Geeetech
 {
-    void TouchDisplay::handle_M2134(const UiCommand &command)
+    void TouchDisplay::handle_M2134_RequestFirmware(const UiCommand &command)
     {
 #ifdef GEEETECH_DISPLAY_DEBUG
         SERIAL_ECHOLNPGM("Firmware info from display: ", command.parameters[FW].c_str());

@@ -28,6 +28,8 @@
 // settings
 #define GEEETECH_DISPLAY_DEBUG // comment out for production
 #define SEND_CYCLE_IN_MS 1000
+#define EXTRUDE_CYCLE_IN_MS 1000
+#define SWITCH_EXTRUDER_CYCLE_IN_MS 5000
 
 // enum, string array, count, boolean generation
 #define GENERATE_ENUM(ENUM) ENUM,
@@ -40,6 +42,7 @@
     COMMAND(Unknown)             \
     COMMAND(GCode)               \
     COMMAND(L101)                \
+    COMMAND(M2105)               \
     COMMAND(M2107)               \
     COMMAND(M2120)               \
     COMMAND(M2134)
@@ -53,6 +56,12 @@
     PARAM(C)                     \
     PARAM(D)                     \
     PARAM(FW)
+
+// modes of extruder moves
+#define FOREACH_E_MODE(MODE) \
+    MODE(LOAD)               \
+    MODE(UNLOAD)             \
+    MODE(CLEAN)
 
 // commands that need immediate answer
 #define FOREACH_ANSWER(PARAMETER, COMMAND) \

@@ -95,7 +95,7 @@ namespace Geeetech
         sendToDisplay("M2107 save success");
     };
 
-    void TouchDisplay::moveToXYWithZHop(const float &xPos, const float &yPos)
+    void TouchDisplay::moveToXYWithZHop(const float_t &xPos, const float_t &yPos)
     {
         do_blocking_move_to_z(MANUAL_LEVELING_MOVE_Z_HOP);
         do_blocking_move_to_xy(xPos, yPos);
@@ -105,7 +105,7 @@ namespace Geeetech
 
     void TouchDisplay::moveUpDownSmallBigStep(const bool &directionUpDown, const bool &bigSmallStep)
     {
-        float newOffset = home_offset[Z_AXIS];
+        float_t newOffset = home_offset[Z_AXIS];
 
         if (directionUpDown == MANUAL_LEVELING_MOVE_DIRECTION_UP)
             newOffset -= bigSmallStep == MANUAL_LEVELING_MOVE_BIG_STEP ? 0.5 : 0.05;

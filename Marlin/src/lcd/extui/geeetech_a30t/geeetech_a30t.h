@@ -54,11 +54,12 @@
 #include "../../../module/temperature.h"
 #include "../../../module/stepper.h"
 #include "../../../module/motion.h"
-#include "../../../libs/duration_t.h"
 #include "../../../module/printcounter.h"
 #include "../../../module/probe.h"
 #include "../../../module/settings.h"
+#include "../../../libs/duration_t.h"
 #include "../../../gcode/queue.h"
+#include "../../../feature/mixing.h"
 
 namespace Geeetech
 {
@@ -76,6 +77,10 @@ namespace Geeetech
     };
     static const char *PARAMETER_STRINGS[] = {FOREACH_PARAMETER(GENERATE_STRING)};
     static const uint8_t PARAMETERS_COUNT = FOREACH_PARAMETER(GENERATE_COUNT);
+
+    enum EMode {
+        FOREACH_E_MODE(GENERATE_ENUM)
+    };
 
     struct UiCommand
     {
@@ -125,11 +130,22 @@ namespace Geeetech
         static void handleUnkownCommand(const UiCommand &command);
         static void handleProprietaryCommand(const UiCommand &command);
 
+        // M2015 extruder control
+        static millis_t nextExtrude;
+        static millis_t nextExtruderSwitch;
+        static bool extrude;
+        static EMode extrudeMode;
+        static uint8_t currentCleaningExtruder;
+        static void handle_M2105_ExtruderCommands(const UiCommand &command);
+        static void handle_M2105_LoadUnloadClean(const EMode &extrudeMode);
+        static void handle_M2105_S4_StopMotors();
+        static void extrudeIfNeeded(const millis_t &currentTimeMs);
+
         // M2107 manual leveling
         static void handle_M2107_ManualLeveling(const UiCommand &command);
         static void handle_M2107_S0_Start();
         static void handle_M2107_S8_OkSave();
-        static void moveToXYWithZHop(const float &xPos, const float &yPos);
+        static void moveToXYWithZHop(const float_t &xPos, const float_t &yPos);
         static void moveUpDownSmallBigStep(const bool &up, const bool &bigStep);
 
         // M2120 automatic leveling
@@ -141,10 +157,10 @@ namespace Geeetech
         static void handle_M2120_P4_MoveDown(const char &sParameter);
         static void handle_M2120_P7_ProbeCenter();
         static void handle_M2120_P6_CenterNozzle();
-        static float mapSParameterToHeight(const char &sParameter);
+        static float_t mapSParameterToHeight(const char &sParameter);
 
         // M2134 request firmware
-        static void handle_M2134(const UiCommand &command);
+        static void handle_M2134_RequestFirmware(const UiCommand &command);
     };
 
     extern TouchDisplay Display;

@@ -96,6 +96,7 @@ namespace Geeetech
                 setNextSendMs(currentTimeMs);
         }
 
+        extrudeIfNeeded(currentTimeMs);
         sendStatusIfNeeded(currentTimeMs);
     }
 

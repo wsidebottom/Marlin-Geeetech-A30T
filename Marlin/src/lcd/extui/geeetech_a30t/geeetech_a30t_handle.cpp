@@ -64,6 +64,9 @@ namespace Geeetech
             simulatedAutoLevelSwitchOn = true;
             disableAxisStatusSend = false;
             break;
+        case M2105:
+            handle_M2105_ExtruderCommands(command);
+            break;
         case M2107:
             handle_M2107_ManualLeveling(command);
             break;
@@ -71,7 +74,7 @@ namespace Geeetech
             handle_M2120_AutoLeveling(command);
             break;
         case M2134:
-            handle_M2134(command);
+            handle_M2134_RequestFirmware(command);
             break;
         default:
 #ifdef GEEETECH_DISPLAY_DEBUG

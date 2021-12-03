@@ -43,6 +43,7 @@
     COMMAND(GCode)               \
     COMMAND(L101)                \
     COMMAND(M290)                \
+    COMMAND(M2011)               \
     COMMAND(M2105)               \
     COMMAND(M2107)               \
     COMMAND(M2120)               \
@@ -71,6 +72,7 @@
 #define FOREACH_ANSWER(PARAMETER, COMMAND) \
     COMMAND(PARAMETER, L101)               \
     COMMAND(PARAMETER, M290)               \
+    COMMAND(PARAMETER, M2011)              \
     COMMAND(PARAMETER, M2120)              \
     COMMAND(PARAMETER, M2140)
 

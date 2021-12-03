@@ -67,6 +67,9 @@ namespace Geeetech
         case M290:
             handle_M290_Babystep(command);
             break;
+        case M2011:
+            handle_M2011_DoubleZOffset(command);
+            break;
         case M2105:
             handle_M2105_ExtruderCommands(command);
             break;

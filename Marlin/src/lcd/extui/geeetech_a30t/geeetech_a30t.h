@@ -193,6 +193,9 @@ namespace Geeetech
         // M2134 request firmware
         static void handle_M2134_RequestFirmware(const UiCommand &command);
 
+        // M2135 set color mix
+        static void handle_M2135_SetColorMix(const UiCommand &command);
+
         // M2140 view/set motion parameters
         static void handle_M2140_MotionParams(const UiCommand &command);
     };

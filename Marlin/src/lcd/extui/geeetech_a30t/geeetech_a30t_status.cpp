@@ -42,9 +42,31 @@ namespace Geeetech
 {
     uint32_t TouchDisplay::getMixerRatio()
     {
-        uint32_t result = mixer.mix[2];
-        result = (result << 7) + mixer.mix[1];
-        result = (result << 7) + mixer.mix[0];
+        mixer_comp_t block[MIXING_STEPPERS];
+        mixer.populate_block(block);
+
+        const float_t sum = block[0] + block[1] + block[2];
+
+        uint8_t percentageE0 = rintf(100.0 * block[0] / sum);
+        uint8_t percentageE1 = rintf(100.0 * block[1] / sum);
+        uint8_t percentageE2 = rintf(100.0 * block[2] / sum);
+
+        const uint8_t diff = 100 - percentageE0 - percentageE1 - percentageE2;
+
+        if (diff != 0)
+        {
+            if (percentageE0 >= percentageE1 && percentageE0 >= percentageE2)
+                percentageE0 += diff;
+            else if (percentageE1 >= percentageE2)
+                percentageE1 += diff;
+            else
+                percentageE2 += diff;
+        }
+
+        uint32_t result = percentageE2;
+        result = (result << 8) + percentageE1;
+        result = (result << 8) + percentageE0;
+
         return result;
     }
 

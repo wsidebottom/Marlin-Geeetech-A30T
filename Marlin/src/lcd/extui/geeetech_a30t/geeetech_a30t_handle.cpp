@@ -85,6 +85,9 @@ namespace Geeetech
         case M2134:
             handle_M2134_RequestFirmware(command);
             break;
+        case M2135:
+            handle_M2135_SetColorMix(command);
+            break;
         case M2140:
             handle_M2140_MotionParams(command);
             break;

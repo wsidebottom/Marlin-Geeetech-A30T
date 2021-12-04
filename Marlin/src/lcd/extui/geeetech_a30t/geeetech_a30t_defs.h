@@ -49,6 +49,7 @@
     COMMAND(M2107)               \
     COMMAND(M2120)               \
     COMMAND(M2134)               \
+    COMMAND(M2135)               \
     COMMAND(M2140)
 
 // parameter enum
@@ -75,6 +76,7 @@
     COMMAND(PARAMETER, M290)               \
     COMMAND(PARAMETER, M2011)              \
     COMMAND(PARAMETER, M2120)              \
+    COMMAND(PARAMETER, M2135)              \
     COMMAND(PARAMETER, M2140)
 
 // manual leveling

@@ -61,6 +61,7 @@
 #include "../../../libs/duration_t.h"
 #include "../../../gcode/queue.h"
 #include "../../../feature/mixing.h"
+#include "../../../feature/bedlevel/bedlevel.h"
 
 namespace Geeetech
 {

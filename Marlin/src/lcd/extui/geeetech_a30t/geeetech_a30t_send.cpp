@@ -146,8 +146,6 @@ namespace Geeetech
         char varB[10];
         char varC[10];
         char varD[10];
-        char varE[10];
-        char varF[10];
 
         // steps/mm: A=X, B=Y, C=Z, D=E(one for all)
         const String p0 = start + "0 A%s B%s C%s D%s";

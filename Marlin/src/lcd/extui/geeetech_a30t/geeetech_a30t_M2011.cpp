@@ -44,7 +44,7 @@ namespace Geeetech
     {
         if (((String) "0").equals(command.parameters[S]))
         {
-            settings.load();   
+            settings.load();
         }
         else
         {

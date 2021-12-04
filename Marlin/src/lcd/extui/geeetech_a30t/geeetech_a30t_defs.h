@@ -45,6 +45,7 @@
     COMMAND(M290)                \
     COMMAND(M2011)               \
     COMMAND(M2105)               \
+    COMMAND(M2106)               \
     COMMAND(M2107)               \
     COMMAND(M2120)               \
     COMMAND(M2134)               \

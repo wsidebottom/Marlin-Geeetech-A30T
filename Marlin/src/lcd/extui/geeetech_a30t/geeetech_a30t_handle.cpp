@@ -73,6 +73,9 @@ namespace Geeetech
         case M2105:
             handle_M2105_ExtruderCommands(command);
             break;
+        case M2106:
+            setFilamentRunoutEnabled('1' == command.parameters[S].charAt(0));
+            break;
         case M2107:
             handle_M2107_ManualLeveling(command);
             break;

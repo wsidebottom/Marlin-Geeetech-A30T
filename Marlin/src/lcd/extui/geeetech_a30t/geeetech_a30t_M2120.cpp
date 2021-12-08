@@ -139,7 +139,7 @@ namespace Geeetech
         switch (sParameter)
         {
         case '0':
-            return 1; // this is defined as 10, but that would be waaaaaay to much!
+            return 10; // this is waaaaaay to much!
         case '1':
             return 1;
         case '2':

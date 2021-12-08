@@ -107,8 +107,8 @@
 
 // status macros
 #define FEEDRATE (uint8_t) round(ExtUI::getFeedrate_mm_s())
-#define BED_ACTIVE thermalManager.isHeatingBed()
-#define E0_ACTIVE thermalManager.isHeatingHotend(0)
+#define BED_ACTIVE thermalManager.temp_bed.target > 0
+#define E0_ACTIVE thermalManager.temp_hotend[0].target > 0
 #define SD_ACTIVE isMediaInserted()
 #define F0_SPEED (uint8_t) round(getActualFan_percent(FAN0))
 #define PRINT_SPEED (uint8_t) round(getFeedrate_percent())

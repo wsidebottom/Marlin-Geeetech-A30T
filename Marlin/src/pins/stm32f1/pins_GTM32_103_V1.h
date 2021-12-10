@@ -160,6 +160,9 @@
 #endif
 */
 
+#define SDIO_SUPPORT
+#define SD_DETECT_PIN                     PC7
+
 /**
  * The on-board TF_CARD_SOCKET microSD card socket has no SD Detect pin wired.
  *

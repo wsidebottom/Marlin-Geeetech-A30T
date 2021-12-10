@@ -2110,7 +2110,6 @@
  * you must uncomment the following option or it won't work.
  */
 #define SDSUPPORT
-#define SDIO_SUPPORT
 
 /**
  * SD CARD: ENABLE CRC

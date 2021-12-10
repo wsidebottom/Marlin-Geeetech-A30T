@@ -26,7 +26,7 @@
  */
 
 // settings
-#define GEEETECH_DISPLAY_DEBUG // comment out for production
+//#define GEEETECH_DISPLAY_DEBUG // comment out for production
 #define SEND_CYCLE_IN_MS 1000
 #define EXTRUDE_CYCLE_IN_MS 1000
 #define SWITCH_EXTRUDER_CYCLE_IN_MS 5000

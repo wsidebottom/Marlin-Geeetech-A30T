@@ -1240,7 +1240,7 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-//#define MULTIPLE_PROBING 2
+#define MULTIPLE_PROBING 2
 //#define EXTRA_PROBING    1
 
 /**
@@ -1380,8 +1380,8 @@
 // @section machine
 
 // The size of the printable area
-#define X_BED_SIZE 320
-#define Y_BED_SIZE 320
+#define X_BED_SIZE 325
+#define Y_BED_SIZE 325
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define X_MIN_POS 0

@@ -32,8 +32,9 @@
 
 #define BOARD_NO_NATIVE_USB
 
-// Avoid conflict with TIMER_SERVO when using the STM32 HAL
-#define TEMP_TIMER   5
+// Set correct timers (will lead to conflicts and instabilities otherwise)
+#define TEMP_TIMER  1
+#define STEP_TIMER  3
 
 //#define DISABLE_DEBUG
 

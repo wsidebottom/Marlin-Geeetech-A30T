@@ -48,7 +48,6 @@ namespace Geeetech
     {
         if (((String) "0").equals(command.parameters[Z]))
         {
-            settings.load();
             temporaryBabystepValue = 0.0;
         }
         else
@@ -56,9 +55,9 @@ namespace Geeetech
             const float zOffset = strtof(command.parameters[Z].c_str(), nullptr);
             
             if (zOffset > temporaryBabystepValue)
-                setZOffset_mm(getZOffset_mm() + 0.01);
+                babystep.add_mm(Z_AXIS, 0.01);
             else
-                setZOffset_mm(getZOffset_mm() - 0.01);
+                babystep.add_mm(Z_AXIS, -0.01);
             temporaryBabystepValue = zOffset;
         }
     }

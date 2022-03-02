@@ -1,0 +1,20 @@
+name: Build
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker://sglahn/platformio-core:latest
+        with:
+          args: run
+          
+      - name: Archive built firmware
+        uses: actions/upload-artifact@v2
+        with:
+          name: firmware
+          path: |
+            .pio/build/**/firmware*.bin

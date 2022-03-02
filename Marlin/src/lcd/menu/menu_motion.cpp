@@ -107,6 +107,13 @@ void lcd_move_x() { _lcd_move_xyz(GET_TEXT(MSG_MOVE_X), X_AXIS); }
   void lcd_move_k() { _lcd_move_xyz(GET_TEXT(MSG_MOVE_K), K_AXIS); }
 #endif
 
+#if BOTH(BELTPRINTER, BELT_KINEMATICS_DEV)
+  // TODO: Implement C-only movement with 'Z_HEAD' as a proxy
+  // It might be implemented by doing the math to move Y and Z in combination
+  // to arrive at the correct C position.
+  void lcd_move_c() { _lcd_move_xyz(GET_TEXT(MSG_MOVE_C), Z_HEAD); }
+#endif
+
 #if E_MANUAL
 
   static void lcd_move_e(TERN_(MULTI_E_MANUAL, const int8_t eindex=active_extruder)) {
@@ -167,6 +174,10 @@ void _menu_move_distance(const AxisEnum axis, const screenFunc_t func, const int
       case X_AXIS: STATIC_ITEM(MSG_MOVE_X, SS_DEFAULT|SS_INVERT); break;
       case Y_AXIS: STATIC_ITEM(MSG_MOVE_Y, SS_DEFAULT|SS_INVERT); break;
       case Z_AXIS: STATIC_ITEM(MSG_MOVE_Z, SS_DEFAULT|SS_INVERT); break;
+      #if BOTH(BELTPRINTER, BELT_KINEMATICS_DEV)
+        // TODO: Implement C-only movement with 'Z_HEAD' as a proxy
+        case Z_HEAD: STATIC_ITEM(MSG_MOVE_C, SS_DEFAULT|SS_INVERT); break;
+      #endif
       default:
         TERN_(MANUAL_E_MOVES_RELATIVE, manual_move_e_origin = current_position.e);
         STATIC_ITEM(MSG_MOVE_E, SS_DEFAULT|SS_INVERT);
@@ -186,7 +197,10 @@ void _menu_move_distance(const AxisEnum axis, const screenFunc_t func, const int
     SUBMENU(MSG_MOVE_10MM, []{ _goto_manual_move(10);    });
     SUBMENU(MSG_MOVE_1MM,  []{ _goto_manual_move( 1);    });
     SUBMENU(MSG_MOVE_01MM, []{ _goto_manual_move( 0.1f); });
-    if (axis == Z_AXIS && (FINE_MANUAL_MOVE) > 0.0f && (FINE_MANUAL_MOVE) < 0.1f) {
+
+    #define FINE_ADJ_AXIS TERN(BELTPRINTER, Y_AXIS, Z_AXIS)
+
+    if (axis == FINE_ADJ_AXIS && (FINE_MANUAL_MOVE) > 0.0f && (FINE_MANUAL_MOVE) < 0.1f) {
       // Determine digits needed right of decimal
       constexpr uint8_t digs = !UNEAR_ZERO((FINE_MANUAL_MOVE) * 1000 - int((FINE_MANUAL_MOVE) * 1000)) ? 4 :
                                !UNEAR_ZERO((FINE_MANUAL_MOVE) *  100 - int((FINE_MANUAL_MOVE) *  100)) ? 3 : 2;
@@ -254,7 +268,11 @@ void menu_move() {
     #if HAS_Z_AXIS
       SUBMENU(MSG_MOVE_Z, []{ _menu_move_distance(Z_AXIS, lcd_move_z); });
     #endif
-    #if HAS_I_AXIS
+    #if BOTH(BELTPRINTER, BELT_KINEMATICS_DEV)
+      // TODO: Implement C-only movement with 'Z_HEAD' as a proxy
+      SUBMENU(MSG_MOVE_C, []{ _menu_move_distance(Z_AXIS, lcd_move_c); });
+    #endif
+    #if LINEAR_AXES >= 4
       SUBMENU(MSG_MOVE_I, []{ _menu_move_distance(I_AXIS, lcd_move_i); });
     #endif
     #if HAS_J_AXIS

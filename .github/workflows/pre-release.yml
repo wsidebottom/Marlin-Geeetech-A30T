@@ -1,0 +1,25 @@
+name: Pre-Release 
+
+on:
+  push:
+    branches:
+      - "2.0.x_cr30"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker://sglahn/platformio-core:latest
+        with:
+          args: run
+          
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            .pio/build/**/firmware*.bin

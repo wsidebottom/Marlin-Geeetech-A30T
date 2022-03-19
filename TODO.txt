@@ -1,0 +1,4 @@
+* Fix "Serial.end()" hack in MarlinCore.cpp#setup() (currently needed for X axis to work)
+* finish implementing LCD code handling
+    * is passing on the GCODE ok?
+    * printer hangs sometimes, seems to be connected to UI. Maybe sending too much?

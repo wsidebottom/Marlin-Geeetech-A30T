@@ -1619,6 +1619,8 @@ void setup() {
     SETUP_RUN(easythreed_ui.init());
   #endif
 
+  Serial.end();
+
   marlin_state = MF_RUNNING;
 
   SETUP_LOG("setup() completed.");

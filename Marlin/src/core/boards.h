@@ -360,6 +360,8 @@
 #define BOARD_ZONESTAR_ZM3E4V2        4060  // Zonestar ZM3E4 V2 (STM32F103VCT6)
 #define BOARD_ERYONE_ERY32_MINI       4061  // Eryone Ery32 mini (STM32F103VET6)
 
+#define BOARD_GTM32_103_V1            4099  // STM32F103VET6 controller
+
 //
 // ARM Cortex-M4F
 //

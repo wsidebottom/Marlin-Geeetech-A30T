@@ -600,9 +600,9 @@
     #define DEFAULT_Ki_LIST {   1.08,   1.08 }
     #define DEFAULT_Kd_LIST { 114.00, 114.00 }
   #else
-    #define DEFAULT_Kp  14.58
-    #define DEFAULT_Ki   1.14
-    #define DEFAULT_Kd  46.57
+    #define DEFAULT_Kp  1
+    #define DEFAULT_Ki  0.49
+    #define DEFAULT_Kd  90
   #endif
 #endif // PIDTEMP
 
@@ -785,7 +785,7 @@
 //#define USE_KMIN_PLUG
 //#define USE_XMAX_PLUG
 //#define USE_YMAX_PLUG
-//#define USE_ZMAX_PLUG
+#define USE_ZMAX_PLUG
 //#define USE_IMAX_PLUG
 //#define USE_JMAX_PLUG
 //#define USE_KMAX_PLUG
@@ -831,7 +831,7 @@
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
 #define X_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.           // DIGA-Tech:
 #define Y_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.           // DIGA-Tech:
-#define Z_MIN_ENDSTOP_INVERTING false  // Set to true to invert the logic of the endstop.           // DIGA-Tech:
+#define Z_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.           // DIGA-Tech:
 #define I_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
 #define J_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
 #define K_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
@@ -1032,7 +1032,7 @@
  * The probe replaces the Z-MIN endstop and is used for Z homing.
  * (Automatically enables USE_PROBE_FOR_Z_HOMING.)
  */
-#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
+//#define Z_MIN_PROBE_USES_Z_MIN_ENDSTOP_PIN
 
 // Force the use of the probe for Z-axis homing
 //#define USE_PROBE_FOR_Z_HOMING
@@ -1052,7 +1052,7 @@
  *      - normally-closed switches to GND and D32.
  *      - normally-open switches to 5V and D32.
  */
-//#define Z_MIN_PROBE_PIN 32 // Pin 32 is the RAMPS default
+#define Z_MIN_PROBE_PIN 19 // Pin 32 is the RAMPS default
 
 /**
  * Probe Type
@@ -1647,10 +1647,10 @@
   //#define MESH_EDIT_GFX_OVERLAY   // Display a graphics overlay while editing the mesh
 
   #define MESH_INSET 10             // Set Mesh bounds as an inset region of the bed                         // DIGA-Tech:
-  #define GRID_MAX_POINTS_X 7       // Don't use more than 15 points per axis, implementation limited.       // DIGA-Tech:
+  #define GRID_MAX_POINTS_X 15       // Don't use more than 15 points per axis, implementation limited.       // DIGA-Tech:
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
-  //#define UBL_HILBERT_CURVE       // Use Hilbert distribution for less travel when probing multiple points
+  #define UBL_HILBERT_CURVE       // Use Hilbert distribution for less travel when probing multiple points
 
   #define UBL_MESH_EDIT_MOVES_Z     // Sophisticated users prefer no movement of nozzle
   #define UBL_SAVE_ACTIVE_ON_M500   // Save the currently active mesh in the current slot on M500
@@ -1751,8 +1751,8 @@
 #define Z_SAFE_HOMING
 
 #if ENABLED(Z_SAFE_HOMING)
-  #define Z_SAFE_HOMING_X_POINT X_BED_SIZE / 2  // X point for Z homing                     // DIGA-Tech:
-  #define Z_SAFE_HOMING_Y_POINT Y_BED_SIZE / 2  // Y point for Z homing                     // DIGA-Tech:
+  #define Z_SAFE_HOMING_X_POINT 0  // X point for Z homing                     // DIGA-Tech:
+  #define Z_SAFE_HOMING_Y_POINT 0  // Y point for Z homing                     // DIGA-Tech:
 #endif
 
 // Homing speeds (mm/min)

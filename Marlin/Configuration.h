@@ -600,9 +600,9 @@
     #define DEFAULT_Ki_LIST {   1.08,   1.08 }
     #define DEFAULT_Kd_LIST { 114.00, 114.00 }
   #else
-    #define DEFAULT_Kp  8.6892
-    #define DEFAULT_Ki   0.7024
-    #define DEFAULT_Kd  26.8715
+    #define DEFAULT_Kp  14.58
+    #define DEFAULT_Ki   1.14
+    #define DEFAULT_Kd  46.57
   #endif
 #endif // PIDTEMP
 
@@ -641,9 +641,9 @@
 
   // 120V 250W silicone heater into 4mm borosilicate (MendelMax 1.5+)
   // from FOPDT model - kp=.39 Tp=405 Tdead=66, Tc set to 79.2, aggressive factor of .15 (vs .1, 1, 10)
-  #define DEFAULT_bedKp 8.7351
-  #define DEFAULT_bedKi 1.5019
-  #define DEFAULT_bedKd 33.8690
+  #define DEFAULT_bedKp 97.1
+  #define DEFAULT_bedKi 1.41
+  #define DEFAULT_bedKd 1675.16
 
   // FIND YOUR OWN: "M303 E-1 C8 S90" to run autotune on the bed at 90 degreesC for 8 cycles.
 #endif // PIDTEMPBED
@@ -831,7 +831,7 @@
 // Mechanical endstop with COM to ground and NC to Signal uses "false" here (most common setup).
 #define X_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.           // DIGA-Tech:
 #define Y_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.           // DIGA-Tech:
-#define Z_MIN_ENDSTOP_INVERTING true  // Set to true to invert the logic of the endstop.           // DIGA-Tech:
+#define Z_MIN_ENDSTOP_INVERTING false  // Set to true to invert the logic of the endstop.           // DIGA-Tech:
 #define I_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
 #define J_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
 #define K_MIN_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
@@ -841,7 +841,7 @@
 #define I_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
 #define J_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
 #define K_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
-#define Z_MIN_PROBE_ENDSTOP_INVERTING true // Set to true to invert the logic of the probe.        // DIGA-Tech: set to true for BABYSTEPPING
+#define Z_MIN_PROBE_ENDSTOP_INVERTING false // Set to true to invert the logic of the probe.        // DIGA-Tech: set to true for BABYSTEPPING
 
 /**
  * Stepper Drivers
@@ -1072,7 +1072,7 @@
  * A Fix-Mounted Probe either doesn't deploy or needs manual deployment.
  *   (e.g., an inductive probe or a nozzle-based probe-switch.)
  */
-#define FIX_MOUNTED_PROBE                                  // DIGA-Tech: enabled to store BABYSTEPPING
+//#define FIX_MOUNTED_PROBE                                  // DIGA-Tech: enabled to store BABYSTEPPING
 
 /**
  * Use the nozzle as the probe, as with a conductive
@@ -1089,7 +1089,7 @@
 /**
  * The BLTouch probe uses a Hall effect sensor and emulates a servo.
  */
-//#define BLTOUCH
+#define BLTOUCH
 
 /**
  * Touch-MI Probe by hotends.fr
@@ -1181,7 +1181,7 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { 0, 0, 0 }                 // DIGA-Tech: probe offset
+#define NOZZLE_TO_PROBE_OFFSET { 28, -33, 0 }                 // DIGA-Tech: probe offset
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
@@ -1241,7 +1241,7 @@
  * A total of 2 does fast/slow probes with a weighted average.
  * A total of 3 or more adds more slow probes, taking the average.
  */
-//#define MULTIPLE_PROBING 2
+#define MULTIPLE_PROBING 2
 //#define EXTRA_PROBING    1
 
 /**
@@ -1270,7 +1270,7 @@
 #define Z_PROBE_OFFSET_RANGE_MAX 20
 
 // Enable the M48 repeatability test to test probe accuracy
-//#define Z_MIN_PROBE_REPEATABILITY_TEST
+#define Z_MIN_PROBE_REPEATABILITY_TEST
 
 // Before deploy/stow pause for user confirmation
 //#define PAUSE_BEFORE_DEPLOY_STOW
@@ -1363,10 +1363,10 @@
  */
 //#define Z_IDLE_HEIGHT Z_HOME_POS
 
-//#define Z_HOMING_HEIGHT  4      // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
+#define Z_HOMING_HEIGHT  4        // (mm) Minimal Z height before homing (G28) for Z clearance above the bed, clamps, ...
                                   // Be sure to have this much clearance over your Z_MAX_POS to prevent grinding.
 
-//#define Z_AFTER_HOMING  10      // (mm) Height to move to after homing Z
+#define Z_AFTER_HOMING  15      // (mm) Height to move to after homing Z
 
 // Direction of endstops when homing; 1=MAX, -1=MIN
 // :[-1,1]
@@ -1548,8 +1548,8 @@
 //#define AUTO_BED_LEVELING_3POINT
 //#define AUTO_BED_LEVELING_LINEAR
 //#define AUTO_BED_LEVELING_BILINEAR
-//#define AUTO_BED_LEVELING_UBL
-#define MESH_BED_LEVELING                                  // DIGA-Tech:
+#define AUTO_BED_LEVELING_UBL
+//#define MESH_BED_LEVELING                                  // DIGA-Tech:
 
 /**
  * Normally G28 leaves leveling disabled on completion. Enable one of
@@ -1751,8 +1751,8 @@
 #define Z_SAFE_HOMING
 
 #if ENABLED(Z_SAFE_HOMING)
-  #define Z_SAFE_HOMING_X_POINT 0  // X point for Z homing                     // DIGA-Tech:
-  #define Z_SAFE_HOMING_Y_POINT 0  // Y point for Z homing                     // DIGA-Tech:
+  #define Z_SAFE_HOMING_X_POINT X_BED_SIZE / 2  // X point for Z homing                     // DIGA-Tech:
+  #define Z_SAFE_HOMING_Y_POINT Y_BED_SIZE / 2  // Y point for Z homing                     // DIGA-Tech:
 #endif
 
 // Homing speeds (mm/min)

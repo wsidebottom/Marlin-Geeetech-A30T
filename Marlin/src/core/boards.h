@@ -25,6 +25,10 @@
 
 #define BOARD_UNKNOWN -1
 
+// Weedo custom board config
+
+#define BOARD_WEEDO_83B         811
+
 //
 // RAMPS 1.3 / 1.4 - ATmega1280, ATmega2560
 //

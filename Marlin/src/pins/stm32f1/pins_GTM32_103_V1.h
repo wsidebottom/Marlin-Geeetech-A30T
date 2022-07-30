@@ -64,12 +64,13 @@
 // Limit Switches
 //
 #define X_MIN_PIN                           PA15
-//#define X_MAX_PIN                           PC6
+#define X_MAX_PIN                           PC6
 #define Y_MIN_PIN                           PD4
 #define Y_MAX_PIN                           PD11
-#define Z_MIN_PIN                           PD10
-//#define Z_MAX_PIN                           PB3
+#define Z_MIN_PIN                           PB3
 #define Z2_MIN_PIN                          PB7
+#define Z2_MAX_PIN                          PD10
+#define Z_PROBE_PIN                         PA1
 
 //
 // Steppers
@@ -90,12 +91,6 @@
 #define Z2_DIR_PIN                          PB6
 #define Z2_ENABLE_PIN                       PB4
 
-// Extruder stepper pins
-// NOTE: Numbering here is made according to EXT connector numbers,
-//       the FANx_PWM line numbering in the schematics is reverse.
-//       That is, E0_*_PIN are the E2_* lines connected to E2_A1 step
-//       stick that drives the EXT0 output on the board.
-//
 #define E0_STEP_PIN                         PB9
 #define E0_DIR_PIN                          PE0
 #define E0_ENABLE_PIN                       PB8
@@ -111,96 +106,52 @@
 //
 // Heaters / Fans
 //
-#define HEATER_0_PIN                        PE9   // EXT0 port
-//#define HEATER_1_PIN                        PB5   // EXT1 port
-//#define HEATER_2_PIN                        PB4   // EXT2 port
-#define HEATER_BED_PIN                      PE14   // CON2X3 hotbed port
+#define HEATER_0_PIN                        PE9
+#define HEATER_1_PIN                        PE11
+#define HEATER_2_PIN                        PE13
+#define HEATER_BED_PIN                      PE14
 
-//
-// These are FAN PWM pins on EXT0..EXT2 connectors.
-//
-#define FAN_PIN                             PA6   // EXT0 port
-//#define FAN1_PIN                            PB8   // EXT1 port
-//#define FAN2_PIN                            PB7   // EXT2 port
+#define FAN_PIN                             PA6
+#define FAN1_PIN                            PA7
+#define FAN2_PIN                            PB1
 
 #ifndef E0_AUTO_FAN_PIN
-  //#define E0_AUTO_FAN_PIN                   PA6   // EXT0 port, used as main extruder fan
+  #define E0_AUTO_FAN_PIN                   FAN_PIN
 #endif
 
 //
 // Temperature Sensors
 //
-#define TEMP_0_PIN                          PC0   // EXT0 port
-//#define TEMP_1_PIN                          PC1   // EXT1 port
-//#define TEMP_2_PIN                          PC2   // EXT2 port
-#define TEMP_BED_PIN                        PC3   // CON2X3 hotbed port
+#define TEMP_0_PIN                          PC0
+#define TEMP_1_PIN                          PC1
+#define TEMP_2_PIN                          PC2
+#define TEMP_BED_PIN                        PC3
 
 //
 // Misc. Functions
 //
-//#define LED_PWM                             PD12  // External LED, pin 2 on LED labeled connector
+#define LED_PWM                             PB10  // External LED, pin 2 on LED labeled connector
 
 //
 // LCD / Controller
 //
-#define LCD_UART_TX                   PD8
-#define LCD_UART_RX                   PD9
+#define LCD_POWER                           PD12
+#define LCD_UART_TX                         PD8
+#define LCD_UART_RX                         PD9
 
 //
 // Beeper
 //
-/*
-#ifdef GTM32_PRO_VB_USE_LCD_BEEPER
-  // This is pin 32 on J2 FFC40 and pin, goes to the beeper
-  // on Geeetech's version of RepRapDiscount Smart Controller
-  // (e.g. on Rostock 301)
-  #define BEEPER_PIN                        PE12
-#else
-  // This is the beeper on the board itself
-  #define BEEPER_PIN                        PB10
-#endif
-*/
+#define BEEPER_PIN                          PD13
 
 #define SDIO_SUPPORT
-#define SD_DETECT_PIN                     PC7
+#define SD_DETECT_PIN                       PC7
 
-/**
- * The on-board TF_CARD_SOCKET microSD card socket has no SD Detect pin wired.
- *
- * The FFC10 (SD_CARD) connector has the same pins as those routed to the FFC40 (J2)
- * connector, which usually go to the SD Card slot on the Geeetech version of the
- * RepRapDiscount Smart Controller. Both connectors have the card detect signal.
- *
- * The on-board SD card and the external card (on either SD_CARD or J2) are two
- * separate devices and can work simultaneously. Unfortunately, Marlin only supports
- * a single SPI Flash device (as of 2019-07-05) so only one is enabled here.
- */
-#if ENABLED(GTM32_PRO_VB_USE_EXT_SDCARD)
-  //
-  // SD Card on RepRapDiscount Smart Controller (J2) or on SD_CARD connector
-  //
-  #define SD_SS_PIN                         PC11
-  #define SD_SCK_PIN                        PC12
-  #define SD_MOSI_PIN                       PD2
-  #define SD_MISO_PIN                       PC8
-  #define SD_DETECT_PIN                     PC7
-#else
-  //
-  // Use the on-board card socket labeled TF_CARD_SOCKET
-  //
-//  #define SD_SS_PIN                         PA4
-//  #define SD_SCK_PIN                        PA5
-//  #define SD_MOSI_PIN                       PA7
-//  #define SD_MISO_PIN                       PA6
-//  #define SD_DETECT_PIN                     -1    // Card detect is not connected
-#endif
+#define SERVO0_PIN                          PA0
 
-//#define SDSS                           SD_SS_PIN
+#define FIL_RUNOUT_PIN                      PE2
+#define FIL_RUNOUT2_PIN                     PE6
+#define FIL_RUNOUT3_PIN                     PE1
 
-//
-// ESP WiFi can be soldered to J9 connector which is wired to USART2.
-// Must define WIFISUPPORT in Configuration.h for the printer.
-//
-//#define ESP_WIFI_MODULE_COM                    2
-//#define ESP_WIFI_MODULE_BAUDRATE          115200
-//#define ESP_WIFI_MODULE_RESET_PIN           -1
+#define I2C_SDA                             PA13
+#define I2C_SCL                             PA14
